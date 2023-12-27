@@ -1,0 +1,16 @@
+VERSION=	0.0.1
+
+PROG=	clone
+OBJS=	clone.o
+
+CFLAGS+=	-pedantic -Wall -Wextra
+CFLAGS+=	-DVERSION=\"${VERSION}\"
+
+all: ${PROG}
+
+${PROG}: ${OBJS}
+	${CC} -o ${PROG} ${OBJS} ${LDFLAGS}
+
+clean:
+	rm -f ${PROG} ${OBJS}
+.PHONY: clean
