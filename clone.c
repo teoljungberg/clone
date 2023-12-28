@@ -28,21 +28,27 @@ extract_repository_from_pattern(char *pattern)
 	char *user = NULL;
 	char *repository_name = NULL;
 
+	char *start, *end;
+	start = "";
+	end = "";
+
 	// Host
-	char *host_start = strstr(pattern, "@");
-	char *host_end = strstr(pattern, ":");
-	host = strndup(host_start + 1, host_end - host_start - 1);
+	if ((start = strstr(pattern, "@"))) {
+		end = strstr(start, ":");
+		host = strndup(start + 1, end - start - 1);
+	}
 
 	// User or organization
-	char *user_start = host_end;
-	char *user_end = strstr(pattern, "/");
-	user = strndup(user_start + 1, user_end - user_start - 1);
+	if ((start = end)) {
+		end = strstr(start, "/");
+		user = strndup(start + 1, end - start - 1);
+	}
 
 	// Repository name
-	char *repository_name_start = user_end;
-	char *repository_name_end = strstr(pattern, ".git");
-	repository_name = strndup(repository_name_start + 1,
-	    repository_name_end - repository_name_start - 1);
+	if ((start = end)) {
+		end = strstr(start, ".git");
+		repository_name = strndup(start + 1, end - start - 1);
+	}
 
 	repository.host = host;
 	repository.user = user;
