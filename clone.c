@@ -52,6 +52,76 @@ extract_repository_from_pattern(char *pattern)
 }
 
 int
+cwd_is_inside_base_project_path(char *base_project_path)
+{
+	char cwd[1024];
+	getcwd(cwd, sizeof(cwd));
+	if (strstr(cwd, base_project_path) != NULL) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+struct Repository
+extract_repository_from_cwd(char *base_project_path, char *pattern)
+{
+	struct Repository repository;
+
+	char *host = NULL;
+	char *user = NULL;
+	char *repository_name = NULL;
+
+	char *start, *end;
+	start = "";
+	end = "";
+
+	char cwd[1024];
+	getcwd(cwd, sizeof(cwd));
+
+	// Host
+	if ((start = strstr(cwd, base_project_path))) {
+		start += strlen(base_project_path);
+		end = strstr(start, "/");
+		host = strndup(start, end - start);
+	}
+
+	// User or organization
+	if ((start = end)) {
+		start += strlen("/");
+		end = strstr(start, "/");
+		user = strndup(start, end - start);
+	}
+
+	// Repository name
+	if ((start = end)) {
+		start += strlen("/");
+		end = strstr(start, "/");
+		repository_name = strndup(start, end - start);
+	}
+
+	// Add pattern if it exists as user or organization / repository name
+	if (strstr(pattern, "/") != NULL) {
+		start = pattern;
+		end = strstr(pattern, "/");
+		user = strndup(start, end - start);
+		start = end + 1;
+		end = strstr(start, ".git");
+		repository_name = strndup(start, end - start);
+	} else {
+		start = pattern;
+		end = strstr(pattern, ".git");
+		repository_name = strndup(start, end - start);
+	}
+
+	repository.host = host;
+	repository.user = user;
+	repository.name = repository_name;
+
+	return repository;
+}
+
+int
 main(int argc, char *argv[])
 {
 	if (argc != 2) {
@@ -66,6 +136,9 @@ main(int argc, char *argv[])
 
 	if (valid_pattern(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
+	} else if (cwd_is_inside_base_project_path(base_project_path) == 0) {
+		repository = extract_repository_from_cwd(base_project_path,
+		    pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
