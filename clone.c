@@ -111,6 +111,7 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 		start = pattern;
 		end = strstr(pattern, "/");
 		user = strndup(start, end - start);
+
 		start = end + 1;
 		end = strstr(start, ".git");
 		repository_name = strndup(start, end - start);
