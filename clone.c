@@ -1,3 +1,4 @@
+#include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +13,13 @@ typedef struct Repository {
 int
 valid_pattern(char *pattern)
 {
-	if (strstr(pattern, "@") != NULL) {
+	char *valid_patterns[] = {
+		"*@*:*/*.git",
+		"*@*:*/*",
+	};
+
+	if (fnmatch(valid_patterns[0], pattern, 0) == 0 ||
+	    fnmatch(valid_patterns[1], pattern, 0) == 0) {
 		return 0;
 	} else {
 		return 1;
