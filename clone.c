@@ -113,8 +113,9 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 		repository_name = strndup(start, end - start);
 	}
 
-	// Add pattern if it exists as user or organization / repository name
-	if (strstr(pattern, "/") != NULL) {
+	// Add pattern if it exists as:
+	//	`user-or-organization / repository-name`
+	if (fnmatch("*/*", pattern, 0) == 0) {
 		start = pattern;
 		end = strstr(pattern, "/");
 		user = strndup(start, end - start);
@@ -122,10 +123,12 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 		start = end + 1;
 		end = strstr(start, ".git");
 		repository_name = strndup(start, end - start);
+	// If pattern is only a repository name, use the user from the cwd and
+	// add the repository name from the pattern
 	} else {
-		start = pattern;
-		end = strstr(pattern, ".git");
-		repository_name = strndup(start, end - start);
+ 		start = pattern;
+ 		end = strstr(pattern, ".git");
+ 		repository_name = strndup(start, end - start);
 	}
 
 	repository.host = host;
@@ -154,6 +157,13 @@ main(int argc, char *argv[])
 		repository = extract_repository_from_cwd(base_project_path,
 		    pattern);
 	} else {
+		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
+		return 1;
+	}
+
+	if (repository.host == NULL ||
+	    repository.user == NULL ||
+	    repository.name == NULL) {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
 	}
