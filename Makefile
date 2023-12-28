@@ -18,3 +18,7 @@ clean:
 fmt:
 	knfmt -i ${PROG}.c
 .PHONY: fmt
+
+test: ${PROG}
+	@ /bin/sh ./test.sh
+.PHONY: test
