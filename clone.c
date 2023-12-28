@@ -3,11 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 
-struct repository {
+typedef struct Repository {
 	char *host;
 	char *user;
 	char *name;
-};
+} repository;
 
 int
 valid_pattern(char *pattern)
@@ -19,10 +19,10 @@ valid_pattern(char *pattern)
 	}
 }
 
-struct repository
+struct Repository
 extract_repository_from_pattern(char *pattern)
 {
-	struct repository repository;
+	struct Repository repository;
 
 	char *host = NULL;
 	char *user = NULL;
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
 	char *pattern = argv[1];
 	char *base_project_path = getenv("HOME");
 	strcat(base_project_path, "/src/");
-	struct repository repository;
+	struct Repository repository;
 
 	if (valid_pattern(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
