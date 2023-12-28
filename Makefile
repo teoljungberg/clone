@@ -17,3 +17,4 @@ clean:
 
 fmt:
 	knfmt -i ${PROG}.c
+.PHONY: fmt
