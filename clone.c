@@ -25,6 +25,7 @@
 // $HOME/src/git.sr.ht/~user/repository
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -84,9 +85,9 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	const char *BASE_PROJECT_PATH = "$HOME/src";
-
 	char *pattern = argv[1];
+	char *base_project_path = getenv("HOME");
+	strcat(base_project_path, "/src/");
 	struct repository repository;
 
 	if (valid_pattern(pattern) == 0) {
@@ -96,7 +97,7 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	fprintf(stdout, "%s/%s/%s/%s", BASE_PROJECT_PATH, repository.host,
+	fprintf(stdout, "%s/%s/%s/%s\n", base_project_path, repository.host,
 	    repository.user, repository.name);
 
 	return 0;
