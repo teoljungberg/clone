@@ -14,3 +14,6 @@ ${PROG}: ${OBJS}
 clean:
 	rm -f ${PROG} ${OBJS}
 .PHONY: clean
+
+fmt:
+	knfmt -i ${PROG}.c
