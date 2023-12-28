@@ -1,5 +1,7 @@
 # clone
 
+## Usage
+
 clone(1) little program in C that converts the pattern of any of the following:
 
 ```
@@ -38,7 +40,7 @@ Into the following path:
 $HOME/src/git.sr.ht/~user/repository
 ```
 
-## Directory aware
+### Directory aware
 
 clone(1) is directory aware, as in clone(1) is executed inside a project
 structure, and a shortcut to a clone(1) command is given. Then the project path
