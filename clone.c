@@ -139,6 +139,18 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 }
 
 int
+valid_repository(struct Repository repository)
+{
+	if (repository.host != NULL ||
+	    repository.user != NULL ||
+	    repository.name != NULL) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+int
 main(int argc, char *argv[])
 {
 	if (argc != 2) {
@@ -161,15 +173,12 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (repository.host == NULL ||
-	    repository.user == NULL ||
-	    repository.name == NULL) {
+	if (valid_repository(repository) == 0) {
+		fprintf(stdout, "%s/%s/%s/%s\n", base_project_path, repository.host, repository.user, repository.name);
+	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
 	}
-
-	fprintf(stdout, "%s/%s/%s/%s\n", base_project_path, repository.host,
-	    repository.user, repository.name);
 
 	return 0;
 }
