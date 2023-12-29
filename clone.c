@@ -4,11 +4,11 @@
 #include <string.h>
 #include <unistd.h>
 
-typedef struct Repository {
+struct Repository {
 	char *host;
 	char *user;
 	char *name;
-} repository;
+};
 
 int
 valid_pattern(char *pattern)
