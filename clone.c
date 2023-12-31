@@ -200,10 +200,10 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
-	location = extract_location_from_repository(clone_path, repository);
-	url = extract_url_from_repository(repository);
-
 	if (valid_repository(repository) == 0) {
+		location = extract_location_from_repository(clone_path, repository);
+		url = extract_url_from_repository(repository);
+
 		fprintf(stdout, "%s %s", url, location);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
