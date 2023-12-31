@@ -8,7 +8,7 @@ test: ${TESTS:.sh=.fake}
 .SUFFIXES: .sh .fake
 
 .sh.fake:
-	sh ${CURDIR}/t.sh ${TESTFLAGS} ${CURDIR}/test-helper.sh ${CURDIR}/$<
+	@ sh ${CURDIR}/t.sh ${TESTFLAGS} ${CURDIR}/test-helper.sh ${CURDIR}/$<
 
 fmt:
 	shfmt -w -i 2 ${TESTS}
