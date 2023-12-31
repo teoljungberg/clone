@@ -17,8 +17,9 @@ clean:
 
 fmt:
 	knfmt -i ${PROG}.c
+	${MAKE} -C tests fmt
 .PHONY: fmt
 
 test: ${PROG}
-	@ /bin/sh ./test.sh
+	$(MAKE) -C tests
 .PHONY: test
