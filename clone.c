@@ -10,6 +10,15 @@ struct Repository {
 	char *name;
 };
 
+char *
+get_clone_path(void)
+{
+	char *clone_path = getenv("HOME");
+	strcat(clone_path, "/src/");
+
+	return clone_path;
+}
+
 int
 valid_pattern(char *pattern)
 {
@@ -185,8 +194,7 @@ main(int argc, char *argv[])
 	}
 
 	char *pattern = argv[1];
-	char *clone_path = getenv("HOME");
-	strcat(clone_path, "/src/");
+	char *clone_path = get_clone_path();
 	struct Repository repository;
 	char *location;
 	char *url;
