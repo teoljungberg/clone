@@ -65,11 +65,11 @@ extract_repository_from_pattern(char *pattern)
 }
 
 int
-cwd_is_inside_base_project_path(char *base_project_path)
+cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[1024];
 	getcwd(cwd, sizeof(cwd));
-	if (strstr(cwd, base_project_path) != NULL) {
+	if (strstr(cwd, clone_path) != NULL) {
 		return 0;
 	} else {
 		return 1;
@@ -77,7 +77,7 @@ cwd_is_inside_base_project_path(char *base_project_path)
 }
 
 struct Repository
-extract_repository_from_cwd(char *base_project_path, char *pattern)
+extract_repository_from_cwd(char *clone_path, char *pattern)
 {
 	struct Repository repository;
 
@@ -93,8 +93,8 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 	getcwd(cwd, sizeof(cwd));
 
 	// Host
-	if ((start = strstr(cwd, base_project_path))) {
-		start += strlen(base_project_path);
+	if ((start = strstr(cwd, clone_path))) {
+		start += strlen(clone_path);
 		end = strstr(start, "/");
 		host = strndup(start, end - start);
 	}
@@ -151,14 +151,13 @@ valid_repository(struct Repository repository)
 }
 
 char *
-extract_location_from_repository(char *base_project_path,
-    struct Repository repository)
+extract_location_from_repository(char *clone_path, struct Repository repository)
 {
-	int size = snprintf(NULL, 0, "%s/%s/%s/%s", base_project_path,
-	    repository.host, repository.user, repository.name) + 1;
+	int size = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path, repository.host,
+	    repository.user, repository.name) + 1;
 	char *out = malloc(size);
 
-	snprintf(out, size, "%s/%s/%s/%s", base_project_path, repository.host,
+	snprintf(out, size, "%s/%s/%s/%s", clone_path, repository.host,
 	    repository.user, repository.name);
 
 	return out;
@@ -186,24 +185,22 @@ main(int argc, char *argv[])
 	}
 
 	char *pattern = argv[1];
-	char *base_project_path = getenv("HOME");
-	strcat(base_project_path, "/src/");
+	char *clone_path = getenv("HOME");
+	strcat(clone_path, "/src/");
 	struct Repository repository;
 	char *location;
 	char *url;
 
 	if (valid_pattern(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
-	} else if (cwd_is_inside_base_project_path(base_project_path) == 0) {
-		repository = extract_repository_from_cwd(base_project_path,
-		    pattern);
+	} else if (cwd_is_inside_clone_path(clone_path) == 0) {
+		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
 	}
 
-	location = extract_location_from_repository(base_project_path,
-	    repository);
+	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
 	if (valid_repository(repository) == 0) {
