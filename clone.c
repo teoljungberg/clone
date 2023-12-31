@@ -150,6 +150,33 @@ valid_repository(struct Repository repository)
 	}
 }
 
+char *
+extract_location_from_repository(char *base_project_path,
+    struct Repository repository)
+{
+	int size = snprintf(NULL, 0, "%s/%s/%s/%s", base_project_path,
+	    repository.host, repository.user, repository.name) + 1;
+	char *out = malloc(size);
+
+	snprintf(out, size, "%s/%s/%s/%s", base_project_path, repository.host,
+	    repository.user, repository.name);
+
+	return out;
+}
+
+char *
+extract_url_from_repository(struct Repository repository)
+{
+	int size = snprintf(NULL, 0, "git@%s/%s/%s", repository.host,
+	    repository.user, repository.name) + 1;
+	char *out = malloc(size);
+
+	snprintf(out, size, "git@%s:%s/%s", repository.host, repository.user,
+	    repository.name);
+
+	return out;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -162,6 +189,8 @@ main(int argc, char *argv[])
 	char *base_project_path = getenv("HOME");
 	strcat(base_project_path, "/src/");
 	struct Repository repository;
+	char *location;
+	char *url;
 
 	if (valid_pattern(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
@@ -173,9 +202,12 @@ main(int argc, char *argv[])
 		return 1;
 	}
 
+	location = extract_location_from_repository(base_project_path,
+	    repository);
+	url = extract_url_from_repository(repository);
+
 	if (valid_repository(repository) == 0) {
-		fprintf(stdout, "%s/%s/%s/%s\n", base_project_path,
-		    repository.host, repository.user, repository.name);
+		fprintf(stdout, "%s %s", url, location);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
