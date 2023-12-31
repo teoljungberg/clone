@@ -174,7 +174,8 @@ main(int argc, char *argv[])
 	}
 
 	if (valid_repository(repository) == 0) {
-		fprintf(stdout, "%s/%s/%s/%s\n", base_project_path, repository.host, repository.user, repository.name);
+		fprintf(stdout, "%s/%s/%s/%s\n", base_project_path,
+		    repository.host, repository.user, repository.name);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
