@@ -123,9 +123,9 @@ extract_repository_from_cwd(char *base_project_path, char *pattern)
 		start = end + 1;
 		end = strstr(start, ".git");
 		repository_name = strndup(start, end - start);
-	// If pattern is only a repository name, use the user from the cwd and
-	// add the repository name from the pattern
 	} else {
+		// If pattern is only a repository name, use the user from the cwd and
+		// add the repository name from the pattern
 		start = pattern;
 		end = strstr(pattern, ".git");
 		repository_name = strndup(start, end - start);
