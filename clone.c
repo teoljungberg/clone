@@ -150,8 +150,7 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 int
 valid_repository(struct Repository repository)
 {
-	if (repository.host != NULL ||
-	    repository.user != NULL ||
+	if (repository.host != NULL || repository.user != NULL ||
 	    repository.name != NULL) {
 		return 0;
 	} else {
@@ -209,7 +208,8 @@ main(int argc, char *argv[])
 	}
 
 	if (valid_repository(repository) == 0) {
-		location = extract_location_from_repository(clone_path, repository);
+		location = extract_location_from_repository(clone_path,
+		    repository);
 		url = extract_url_from_repository(repository);
 
 		fprintf(stdout, "%s %s", url, location);
