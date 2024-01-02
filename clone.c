@@ -212,7 +212,7 @@ main(int argc, char *argv[])
 		    repository);
 		url = extract_url_from_repository(repository);
 
-		fprintf(stdout, "%s %s", url, location);
+		fprintf(stdout, "%s %s %s", "git clone", url, location);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
