@@ -7,5 +7,5 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)/
 CLONE="$ROOT/clone"
 
 clone() {
-  "$CLONE" "$@"
+  "$CLONE" -d "$@"
 }

@@ -1,8 +1,16 @@
 #include <fnmatch.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+static void
+usage(void)
+{
+	fprintf(stderr, "usage: clone [-dh] pattern\n");
+	exit(2);
+}
 
 struct Repository {
 	char *host;
@@ -187,16 +195,33 @@ extract_url_from_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
-	if (argc != 2) {
-		fprintf(stderr, "Usage: %s <repository>\n", argv[0]);
-		return 1;
-	}
-
 	char *pattern = argv[1];
 	char *clone_path = get_clone_path();
 	struct Repository repository;
 	char *location;
 	char *url;
+
+	int opt;
+	int debug = 0;
+
+	while ((opt = getopt(argc, argv, "dh")) != -1)
+		switch (opt) {
+		case 'd':
+			debug = 1;
+			break;
+		case 'h':
+			usage();
+		default:
+			usage();
+		}
+	argc -= optind;
+	argv += optind;
+
+	if (argc < 1) {
+		usage();
+	}
+
+	pattern = argv[0];
 
 	if (valid_pattern(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
@@ -212,7 +237,10 @@ main(int argc, char *argv[])
 		    repository);
 		url = extract_url_from_repository(repository);
 
-		fprintf(stdout, "%s %s %s", "git clone", url, location);
+		if (debug == 1) {
+			fprintf(stdout, "%s %s %s\n", "git clone", url, location);
+		}
+		// TODO: perform the git clone using execv(3)
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
