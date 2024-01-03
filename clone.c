@@ -238,9 +238,13 @@ main(int argc, char *argv[])
 		url = extract_url_from_repository(repository);
 
 		if (debug == 1) {
-			fprintf(stdout, "%s %s %s\n", "git clone", url, location);
+			fprintf(stdout, "%s %s %s\n", "git clone", url,
+			    location);
+		} else {
+			const char *translated_clone_command[] = { "git",
+				"clone", url, location, NULL };
+			execvp("clone", (char *const *)translated_clone_command);
 		}
-		// TODO: perform the git clone using execv(3)
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
 		return 1;
