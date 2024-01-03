@@ -8,7 +8,7 @@
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: clone [-dh] pattern\n");
+	fprintf(stderr, "usage: %s [-dh] pattern\n", getprogname());
 	exit(2);
 }
 
