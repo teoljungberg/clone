@@ -10,7 +10,7 @@ test: ${TESTS:.sh=.fake}
 .SUFFIXES: .sh .fake
 
 .sh.fake:
-	@ sh ${PROJECT_ROOT}/tests/t.sh ${TESTFLAGS} ${PROJECT_ROOT}/tests/test-helper.sh ${PROJECT_ROOT}/tests/$<
+	@ sh ${.CURDIR}/t.sh ${TESTFLAGS} ${.CURDIR}/test-helper.sh ${.CURDIR}/$<
 
 fmt:
 	shfmt -w -i 2 ${TESTS}
