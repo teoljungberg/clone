@@ -64,10 +64,6 @@ extract_repository_from_pattern(char *pattern)
 {
 	struct Repository repository;
 
-	char *host = NULL;
-	char *user = NULL;
-	char *repository_name = NULL;
-
 	char *start, *end;
 	start = "";
 	end = "";
@@ -75,24 +71,20 @@ extract_repository_from_pattern(char *pattern)
 	// Host
 	if ((start = strstr(pattern, "@"))) {
 		end = strstr(start, ":");
-		host = strndup(start + 1, end - start - 1);
+		repository.host = strndup(start + 1, end - start - 1);
 	}
 
 	// User or organization
 	if ((start = end)) {
 		end = strstr(start, "/");
-		user = strndup(start + 1, end - start - 1);
+		repository.user = strndup(start + 1, end - start - 1);
 	}
 
 	// Repository name
 	if ((start = end)) {
 		end = strstr(start, ".git");
-		repository_name = strndup(start + 1, end - start - 1);
+		repository.name = strndup(start + 1, end - start - 1);
 	}
-
-	repository.host = host;
-	repository.user = user;
-	repository.name = repository_name;
 
 	return repository;
 }
@@ -114,10 +106,6 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 {
 	struct Repository repository;
 
-	char *host = NULL;
-	char *user = NULL;
-	char *repository_name = NULL;
-
 	char *start, *end;
 	start = "";
 	end = "";
@@ -129,21 +117,21 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	if ((start = strstr(cwd, clone_path))) {
 		start += strlen(clone_path);
 		end = strstr(start, "/");
-		host = strndup(start, end - start);
+		repository.host = strndup(start, end - start);
 	}
 
 	// User or organization
 	if ((start = end)) {
 		start += strlen("/");
 		end = strstr(start, "/");
-		user = strndup(start, end - start);
+		repository.user = strndup(start, end - start);
 	}
 
 	// Repository name
 	if ((start = end)) {
 		start += strlen("/");
 		end = strstr(start, "/");
-		repository_name = strndup(start, end - start);
+		repository.name = strndup(start, end - start);
 	}
 
 	// Add pattern if it exists as:
@@ -151,22 +139,18 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	if (fnmatch("*/*", pattern, 0) == 0) {
 		start = pattern;
 		end = strstr(pattern, "/");
-		user = strndup(start, end - start);
+		repository.user = strndup(start, end - start);
 
 		start = end + 1;
 		end = strstr(start, ".git");
-		repository_name = strndup(start, end - start);
+		repository.name = strndup(start, end - start);
 	} else {
 		// If pattern is only a repository name, use the user from the cwd and
 		// add the repository name from the pattern
 		start = pattern;
 		end = strstr(pattern, ".git");
-		repository_name = strndup(start, end - start);
+		repository.name = strndup(start, end - start);
 	}
-
-	repository.host = host;
-	repository.user = user;
-	repository.name = repository_name;
 
 	return repository;
 }
