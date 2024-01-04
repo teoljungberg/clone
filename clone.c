@@ -195,8 +195,8 @@ extract_url_from_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
-	char *pattern = argv[1];
 	char *clone_path = get_clone_path();
+	char *pattern;
 	struct Repository repository;
 	char *location;
 	char *url;
