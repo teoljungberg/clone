@@ -8,7 +8,7 @@
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-dh] pattern\n", getprogname());
+	fprintf(stderr, "usage: %s [-d] pattern\n", getprogname());
 	exit(2);
 }
 
@@ -204,13 +204,11 @@ main(int argc, char *argv[])
 	int ch;
 	int dflag = 0;
 
-	while ((ch = getopt(argc, argv, "dh")) != -1)
+	while ((ch = getopt(argc, argv, "d")) != -1)
 		switch (ch) {
 		case 'd':
 			dflag = 1;
 			break;
-		case 'h':
-			usage();
 		default:
 			usage();
 		}
