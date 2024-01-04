@@ -1,5 +1,3 @@
-PROJECT_ROOT := $(shell git rev-parse --show-toplevel)
-
 TESTS+=	clone-inside-project-base-directory.sh
 TESTS+=	clone-outside-project-base-directory.sh
 
