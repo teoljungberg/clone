@@ -244,7 +244,8 @@ main(int argc, char *argv[])
 		} else {
 			const char *translated_clone_command[] = { "git",
 				"clone", url, location, NULL };
-			execvp("clone", (char *const *)translated_clone_command);
+			execvp("clone",
+			    (char *const *)translated_clone_command);
 		}
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
