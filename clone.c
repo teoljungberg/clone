@@ -202,12 +202,12 @@ main(int argc, char *argv[])
 	char *url;
 
 	int ch;
-	int debug_flag = 0;
+	int dflag = 0;
 
 	while ((ch = getopt(argc, argv, "dh")) != -1)
 		switch (ch) {
 		case 'd':
-			debug_flag = 1;
+			dflag = 1;
 			break;
 		case 'h':
 			usage();
@@ -237,7 +237,7 @@ main(int argc, char *argv[])
 		    repository);
 		url = extract_url_from_repository(repository);
 
-		if (debug_flag == 1) {
+		if (dflag == 1) {
 			fprintf(stdout, "%s %s %s\n", "git clone", url,
 			    location);
 		} else {
