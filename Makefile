@@ -16,7 +16,7 @@ clean:
 .PHONY: clean
 
 fmt:
-	knfmt -i ${PROG}.c
+	knfmt -d ${PROG}.c
 	${MAKE} -C tests fmt
 .PHONY: fmt
 
