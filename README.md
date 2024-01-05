@@ -10,19 +10,20 @@ git@github.com:user/repository.git
 user/repository
 ```
 
-Into a local path of the following form and prints it to stdout:
+Into a git-clone(1) command to clone the URL into a pre-determined directory
+structure:
 
 ```
-$HOME/src/github.com/user/repository
+% git clone git@github.com:user/repository $HOME/src/github.com/user/repository
 ```
 
-It also handles different git hosts, such as gitlab.com, bitbucket.org, etc.
+It also handles different git hosts, such as gitlab.com, git.sr.ht, etc.
 
 ```
 git@host:user/repository
 ```
 
-Converts to:
+Converts to into the directory pattern:
 
 ```
 $HOME/src/host/user/repository
@@ -38,6 +39,13 @@ Into the following path:
 
 ```
 $HOME/src/git.sr.ht/~user/repository
+```
+
+To only print out the command that is supposed to be run, pass `-d` to clone:
+
+```
+% clone -d git@github.com:user/repository
+git clone git@github.com:user/repository $HOME/src//github.com/user/repository
 ```
 
 ### Directory aware
@@ -57,5 +65,5 @@ $HOME/src/github.com/example
 Then the command returned would be:
 
 ```
-$HOME/src/github.com/example/another-project
+% git clone git@github.com:example/another-project $HOME/src/github.com/example/another-project
 ```
