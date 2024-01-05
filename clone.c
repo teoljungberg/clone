@@ -18,6 +18,16 @@ struct Repository {
 	char *name;
 };
 
+int
+valid_repository(struct Repository repository)
+{
+	if (repository.host != NULL || repository.user != NULL ||
+	    repository.name != NULL)
+		return 0;
+	else
+		return 1;
+}
+
 char *
 get_clone_path(void)
 {
@@ -152,16 +162,6 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	return repository;
 }
 
-int
-valid_repository(struct Repository repository)
-{
-	if (repository.host != NULL || repository.user != NULL ||
-	    repository.name != NULL)
-		return 0;
-	else
-		return 1;
-}
-
 char *
 extract_location_from_repository(char *clone_path, struct Repository repository)
 {
@@ -220,26 +220,26 @@ main(int argc, char *argv[])
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
-		return 1;
+		exit(1);
 	}
 
-	if (valid_repository(repository) == 0) {
-		location = extract_location_from_repository(clone_path,
-		    repository);
-		url = extract_url_from_repository(repository);
+	if (valid_repository(repository) != 0) {
+		fprintf(stderr, "Could not extract repository from %s or pwd", pattern);
+		exit(1);
+	}
 
-		if (dflag == 1) {
-			fprintf(stdout, "%s %s %s\n", "git clone", url,
-			    location);
-		} else {
-			const char *translated_clone_command[] = { "git",
-				"clone", url, location, NULL };
-			execvp("clone",
-			    (char *const *)translated_clone_command);
-		}
+	location = extract_location_from_repository(clone_path,
+	    repository);
+	url = extract_url_from_repository(repository);
+
+	if (dflag == 1) {
+		fprintf(stdout, "%s %s %s\n", "git clone", url,
+		    location);
 	} else {
-		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
-		return 1;
+		const char *translated_clone_command[] = { "git",
+			"clone", url, location, NULL };
+		execvp("clone",
+		    (char *const *)translated_clone_command);
 	}
 
 	return 0;
