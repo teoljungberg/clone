@@ -36,11 +36,10 @@ valid_pattern(char *pattern)
 	};
 
 	if (fnmatch(valid_patterns[0], pattern, 0) == 0 ||
-	    fnmatch(valid_patterns[1], pattern, 0) == 0) {
+	    fnmatch(valid_patterns[1], pattern, 0) == 0)
 		return 0;
-	} else {
+	else
 		return 1;
-	}
 }
 
 int
@@ -52,11 +51,10 @@ non_url_pattern(char *pattern)
 	};
 
 	if (fnmatch(url_patterns[0], pattern, 0) == 0 ||
-	    fnmatch(url_patterns[1], pattern, 0) == 0) {
+	    fnmatch(url_patterns[1], pattern, 0) == 0)
 		return 1;
-	} else {
+	else
 		return 0;
-	}
 }
 
 struct Repository
@@ -64,7 +62,7 @@ extract_repository_from_pattern(char *pattern)
 {
 	struct Repository repository;
 
-	char *start, *end;
+	char *end, *start;
 	start = "";
 	end = "";
 
@@ -94,11 +92,10 @@ cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[1024];
 	getcwd(cwd, sizeof(cwd));
-	if (strstr(cwd, clone_path) != NULL) {
+	if (strstr(cwd, clone_path) != NULL)
 		return 0;
-	} else {
+	else
 		return 1;
-	}
 }
 
 struct Repository
@@ -106,7 +103,7 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 {
 	struct Repository repository;
 
-	char *start, *end;
+	char *end, *start;
 	start = "";
 	end = "";
 
@@ -159,11 +156,10 @@ int
 valid_repository(struct Repository repository)
 {
 	if (repository.host != NULL || repository.user != NULL ||
-	    repository.name != NULL) {
+	    repository.name != NULL)
 		return 0;
-	} else {
+	else
 		return 1;
-	}
 }
 
 char *
@@ -195,16 +191,10 @@ extract_url_from_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
-	char *clone_path = get_clone_path();
-	char *pattern;
-	struct Repository repository;
-	char *location;
-	char *url;
-
-	int ch;
 	int dflag = 0;
+	int ch;
 
-	while ((ch = getopt(argc, argv, "d")) != -1)
+	while ((ch = getopt(argc, argv, "d")) != -1) {
 		switch (ch) {
 		case 'd':
 			dflag = 1;
@@ -212,12 +202,16 @@ main(int argc, char *argv[])
 		default:
 			usage();
 		}
+	}
 	argc -= optind;
 	argv += optind;
 
-	if (argc < 1) {
+	char *clone_path = get_clone_path();
+	char *location, *pattern, *url;
+	struct Repository repository;
+
+	if (argc < 1)
 		usage();
-	}
 
 	pattern = argv[0];
 
