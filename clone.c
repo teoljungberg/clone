@@ -165,15 +165,11 @@ valid_repository(struct Repository repository)
 char *
 extract_location_from_repository(char *clone_path, struct Repository repository)
 {
-	int size = strlen(clone_path) +
-	    strlen(repository.host) +
-	    strlen(repository.user) +
-	    strlen(repository.name) +
-	    4; // / = 1; * 4
-	char *out = malloc(size);
+	char format[12] = "%s/%s/%s/%s";
+	char *out;
 
-	snprintf(out, size, "%s/%s/%s/%s", clone_path, repository.host,
-	    repository.user, repository.name);
+	asprintf(&out, format, clone_path, repository.host, repository.user,
+	    repository.name);
 
 	return out;
 }
@@ -181,13 +177,10 @@ extract_location_from_repository(char *clone_path, struct Repository repository)
 char *
 extract_url_from_repository(struct Repository repository)
 {
-	int size = strlen(repository.host) +
-	    strlen(repository.user) +
-	    strlen(repository.name) +
-	    7; // git@ = 4; : = 1; / = 1; \0 = 1
-	char *out = malloc(size);
+	char format[13] = "git@%s:%s/%s";
+	char *out;
 
-	snprintf(out, size, "git@%s:%s/%s", repository.host, repository.user,
+	asprintf(&out, format, repository.host, repository.user,
 	    repository.name);
 
 	return out;
