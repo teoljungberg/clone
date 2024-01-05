@@ -219,12 +219,14 @@ main(int argc, char *argv[])
 	    non_url_pattern(pattern) == 0) {
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
-		fprintf(stderr, "Invalid repository pattern: %s\n", pattern);
+		fprintf(stderr, "Invalid repository pattern or cwd: %s\n",
+		    pattern);
 		exit(1);
 	}
 
 	if (valid_repository(repository) != 0) {
-		fprintf(stderr, "Could not extract repository from %s or pwd", pattern);
+		fprintf(stderr, "Could not extract repository from %s or pwd",
+		    pattern);
 		exit(1);
 	}
 
