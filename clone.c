@@ -41,8 +41,8 @@ int
 valid_pattern(char *pattern)
 {
 	char *valid_patterns[] = {
-		"*@*:*/*.git",
-		"*@*:*/*",
+		"git@*:*/*.git",
+		"git@*:*/*",
 	};
 
 	if (fnmatch(valid_patterns[0], pattern, 0) == 0 ||
