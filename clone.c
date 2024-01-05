@@ -57,7 +57,7 @@ non_url_pattern(char *pattern)
 {
 	char *url_patterns[] = {
 		"https://*",
-		"git@*",
+		"git://*",
 	};
 
 	if (fnmatch(url_patterns[0], pattern, 0) == 0 ||
