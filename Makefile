@@ -15,8 +15,13 @@ clean:
 	rm -f ${PROG} ${OBJS}
 .PHONY: clean
 
+lint:
+	mandoc -Tlint -Wstyle ${PROG}.1
+	knfmt -ds ${PROG}.c
+.PHONE :lint
+
 fmt:
-	knfmt -d ${PROG}.c
+	knfmt -is ${PROG}.c
 	${MAKE} -C tests fmt
 .PHONY: fmt
 
