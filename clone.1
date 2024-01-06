@@ -1,0 +1,69 @@
+.TH CLONE 1 "January 5, 2024" "0.0.1"
+.SH NAME
+clone \- a utility to git-clone(1) repositories into a pre-determined directory
+structure.
+.SH SYNOPSIS
+.B clone
+[OPTION]... [REPOSITORY]
+.SH DESCRIPTION
+\fBclone\fR is a small C program that facilitates the cloning of git
+repositories into a specific directory structure. It converts various git
+repository patterns into a standard git-clone(1) command. The program supports
+different git hosts like GitHub, GitLab, and others. It modifies the repository
+URL to clone the repository into a structured directory pattern based on the
+host and repository details. The utility is also directory aware, meaning it
+can understand and use the current directory structure to determine the clone
+path for a repository.
+.SH OPTIONS
+.TP
+.B \-d
+Dry run. Outputs the git clone command that would be run, without executing it.
+.SH REPOSITORY PATTERN
+The program accepts the following patterns for the repository:
+.IP •
+git@host:user/repository
+.IP •
+git@host:user/repository.git
+.IP •
+user/repository
+.IP •
+repository
+.P
+Where 'host' can be any git hosting service like github.com, gitlab.com,
+git.sr.ht, etc.
+.SH DIRECTORY STRUCTURE
+The default directory pattern for the cloned repository is as follows:
+.IP •
+$HOME/src/host/user/repository
+.P
+For example, a repository from github.com would be cloned into:
+.IP •
+$HOME/src/github.com/user/repository
+.SH DIRECTORY AWARENESS
+When executed inside a project structure, clone can take a shortcut to a clone
+command. It uses the existing project path structure to determine the clone
+path.
+.P
+Example:
+.IP •
+Running 'clone another-project' inside $HOME/src/github.com/user would result
+in:
+.IP •
+git clone git@github.com:user/another-project
+$HOME/src/github.com/user/another-project
+.SH EXAMPLES
+To clone a repository from GitHub:
+.IP •
+.B % clone git@github.com:user/repository
+.P
+To clone a repository from a custom git host:
+.IP •
+.B % clone git@host:user/repository
+.P
+To output the git clone command without executing it:
+.IP •
+.B % clone -d git@github.com:user/repository
+.SH AUTHOR
+Teo Ljungberg <teo@teoljungberg.com>
+.SH "SEE ALSO"
+git-clone(1)
