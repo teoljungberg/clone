@@ -144,8 +144,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	// Add pattern if it exists as:
 	//	`user-or-organization / repository-name`
 	if (fnmatch("*/*", pattern, 0) == 0) {
-		start = pattern;
-		end = strstr(pattern, "/");
+		start = strdup(pattern);
+		end = strstr(start, "/");
 		repository.user = strndup(start, end - start);
 
 		start = end + 1;
@@ -154,8 +154,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	} else {
 		// If pattern is only a repository name, use the user from the cwd and
 		// add the repository name from the pattern
-		start = pattern;
-		end = strstr(pattern, ".git");
+		start = strdup(pattern);
+		end = strstr(start, ".git");
 		repository.name = strndup(start, end - start);
 	}
 
