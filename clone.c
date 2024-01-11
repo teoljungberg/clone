@@ -77,19 +77,19 @@ extract_repository_from_pattern(char *pattern)
 	end = "";
 
 	// Host
-	if ((start = strstr(pattern, "@"))) {
+	if (start = strstr(pattern, "@")) {
 		end = strstr(start, ":");
 		repository.host = strndup(start + 1, end - start - 1);
 	}
 
 	// User or organization
-	if ((start = end)) {
+	if (start = end) {
 		end = strstr(start, "/");
 		repository.user = strndup(start + 1, end - start - 1);
 	}
 
 	// Repository name
-	if ((start = end)) {
+	if (start = end) {
 		end = strstr(start, ".git");
 		repository.name = strndup(start + 1, end - start - 1);
 	}
@@ -121,21 +121,21 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	getcwd(cwd, sizeof(cwd));
 
 	// Host
-	if ((start = strstr(cwd, clone_path))) {
+	if (start = strstr(cwd, clone_path)) {
 		start += strlen(clone_path);
 		end = strstr(start, "/");
 		repository.host = strndup(start, end - start);
 	}
 
 	// User or organization
-	if ((start = end)) {
+	if (start = end) {
 		start += strlen("/");
 		end = strstr(start, "/");
 		repository.user = strndup(start, end - start);
 	}
 
 	// Repository name
-	if ((start = end)) {
+	if (start = end) {
 		start += strlen("/");
 		end = strstr(start, "/");
 		repository.name = strndup(start, end - start);
