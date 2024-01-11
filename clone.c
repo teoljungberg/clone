@@ -240,7 +240,7 @@ main(int argc, char *argv[])
 	} else {
 		const char *translated_clone_command[] = { "git",
 			"clone", url, location, NULL };
-		execvp("clone",
+		execvp(translated_clone_command[0],
 		    (char *const *)translated_clone_command);
 	}
 
