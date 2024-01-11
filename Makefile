@@ -11,6 +11,8 @@ INSTALL_MAN=		install -m 0644
 
 CFLAGS+=	-pedantic -Wall -Wextra
 CFLAGS+=	-DVERSION=\"${VERSION}\"
+# Uncomment to enable debugging
+# CFLAGS+=	-g -DDEBUG=1
 
 all: ${PROG}
 
