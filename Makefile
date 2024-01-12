@@ -37,7 +37,7 @@ lint:
 
 fmt:
 	knfmt -is ${PROG}.c
-	${MAKE} -C tests fmt
+	${MAKE} -C ${.CURDIR}/tests fmt
 .PHONY: fmt
 
 test: ${PROG}
