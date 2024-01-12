@@ -181,7 +181,10 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	end = strchr(start, '/');
 	if (!end)
 		end = strstr(start, ".git");
-	repository.name = end ? copy_substring(start, end) : strdup(start);
+	if (end)
+		repository.name = copy_substring(start, end);
+	else
+		repository.name = strdup(start);
 
 	overload_repository_with_pattern(&repository, pattern);
 
