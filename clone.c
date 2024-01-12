@@ -192,15 +192,20 @@ char *
 extract_location_from_repository(char *clone_path, struct Repository repository)
 {
 	char format[12] = "%s/%s/%s/%s";
-	char *out;
-	int asprintf_result;
+	int required_size;
 
-	asprintf_result = asprintf(&out, format, clone_path, repository.host,
-	    repository.user,
-	    repository.name);
+	required_size = snprintf(NULL, 0, format, clone_path, repository.host,
+	    repository.user, repository.name);
 
-	if (asprintf_result == -1)
+	if (required_size < 0)
 		return NULL;
+
+	char *out = malloc(required_size + 1);
+	if (!out)
+		return NULL;
+
+	snprintf(out, required_size + 1, format, clone_path, repository.host,
+	    repository.user, repository.name);
 
 	return out;
 }
@@ -209,15 +214,20 @@ char *
 extract_url_from_repository(struct Repository repository)
 {
 	char format[13] = "git@%s:%s/%s";
-	char *out;
-	int asprintf_result;
+	int required_size;
 
-	asprintf_result = asprintf(&out, format, repository.host,
-	    repository.user,
-	    repository.name);
+	required_size = snprintf(NULL, 0, format, repository.host,
+	    repository.user, repository.name);
 
-	if (asprintf_result == -1)
+	if (required_size < 0)
 		return NULL;
+
+	char *out = malloc(required_size + 1);
+	if (!out)
+		return NULL;
+
+	snprintf(out, required_size + 1, format, repository.host,
+	    repository.user, repository.name);
 
 	return out;
 }
