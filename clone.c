@@ -67,31 +67,37 @@ non_url_pattern(char *pattern)
 		return 0;
 }
 
+char *
+copy_substring(char *start, char *end)
+{
+	if (!start || !end || end <= start)
+		return NULL;
+	return strndup(start, end - start);
+}
+
 struct Repository
 extract_repository_from_pattern(char *pattern)
 {
-	struct Repository repository;
+	struct Repository repository = {NULL, NULL, NULL};
 
-	char *end, *start;
-	start = "";
-	end = "";
+	if (!pattern)
+		return repository;
 
-	// Host
-	if (start = strstr(pattern, "@")) {
-		end = strstr(start, ":");
-		repository.host = strndup(start + 1, end - start - 1);
-	}
+	char *at = strchr(pattern, '@');
+	char *colon = strchr(pattern, ':');
+	char *slash = strchr(pattern, '/');
 
-	// User or organization
-	if (start = end) {
-		end = strstr(start, "/");
-		repository.user = strndup(start + 1, end - start - 1);
-	}
+	if (at && colon && at < colon)
+		repository.host = copy_substring(at + 1, colon);
 
-	// Repository name
-	if (start = end) {
-		end = strstr(start, ".git");
-		repository.name = strndup(start + 1, end - start - 1);
+	if (colon && slash && colon < slash)
+		repository.user = copy_substring(colon + 1, slash);
+
+	if (slash) {
+		char *end = strstr(slash, ".git");
+		if (!end)
+			end = pattern + strlen(pattern);
+		repository.name = copy_substring(slash + 1, end);
 	}
 
 	return repository;
@@ -121,21 +127,21 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	getcwd(cwd, sizeof(cwd));
 
 	// Host
-	if (start = strstr(cwd, clone_path)) {
+	if ((start = strstr(cwd, clone_path))) {
 		start += strlen(clone_path);
 		end = strstr(start, "/");
 		repository.host = strndup(start, end - start);
 	}
 
 	// User or organization
-	if (start = end) {
+	if ((start = end)) {
 		start += strlen("/");
 		end = strstr(start, "/");
 		repository.user = strndup(start, end - start);
 	}
 
 	// Repository name
-	if (start = end) {
+	if ((start = end)) {
 		start += strlen("/");
 		end = strstr(start, "/");
 		repository.name = strndup(start, end - start);
