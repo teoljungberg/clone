@@ -191,9 +191,14 @@ extract_location_from_repository(char *clone_path, struct Repository repository)
 {
 	char format[12] = "%s/%s/%s/%s";
 	char *out;
+	int asprintf_result;
 
-	asprintf(&out, format, clone_path, repository.host, repository.user,
+	asprintf_result = asprintf(&out, format, clone_path, repository.host,
+	    repository.user,
 	    repository.name);
+
+	if (asprintf_result == -1)
+		return NULL;
 
 	return out;
 }
@@ -203,9 +208,14 @@ extract_url_from_repository(struct Repository repository)
 {
 	char format[13] = "git@%s:%s/%s";
 	char *out;
+	int asprintf_result;
 
-	asprintf(&out, format, repository.host, repository.user,
+	asprintf_result = asprintf(&out, format, repository.host,
+	    repository.user,
 	    repository.name);
+
+	if (asprintf_result == -1)
+		return NULL;
 
 	return out;
 }
