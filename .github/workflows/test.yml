@@ -63,8 +63,6 @@ jobs:
           set -ex
           ${CC} -v
           MAKE="make -j `${{matrix.nproc}}`"
-          ./configure || :
-          cat config.log
           ${MAKE} test
           # Ensure assertions are free from side effects.
           env CPPFLAGS="${CPPFLAGS} -DNDEBUG" ./configure || :
