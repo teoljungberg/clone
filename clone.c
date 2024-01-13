@@ -47,9 +47,9 @@ valid_git_clone_url(char *pattern)
 
 	if (fnmatch(valid_patterns[0], pattern, 0) == 0 ||
 	    fnmatch(valid_patterns[1], pattern, 0) == 0)
-		return 0;
-	else
 		return 1;
+	else
+		return 0;
 }
 
 char *
@@ -93,12 +93,12 @@ cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
-		return 1;
+		return 0;
 
 	if (strstr(cwd, clone_path) != NULL)
-		return 0;
-	else
 		return 1;
+	else
+		return 0;
 }
 
 void
@@ -247,9 +247,9 @@ main(int argc, char *argv[])
 
 	pattern = argv[0];
 
-	if (valid_git_clone_url(pattern) == 0) {
+	if (valid_git_clone_url(pattern)) {
 		repository = extract_repository_from_pattern(pattern);
-	} else if (cwd_is_inside_clone_path(clone_path) == 0) {
+	} else if (cwd_is_inside_clone_path(clone_path)) {
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern or cwd: %s\n",
@@ -267,7 +267,7 @@ main(int argc, char *argv[])
 	    repository);
 	url = extract_url_from_repository(repository);
 
-	if (dflag == 1) {
+	if (dflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url,
 		    location);
 	} else {
