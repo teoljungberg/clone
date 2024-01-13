@@ -263,8 +263,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-	location = extract_location_from_repository(clone_path,
-	    repository);
+	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
 	if (dflag) {
