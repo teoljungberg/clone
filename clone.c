@@ -57,6 +57,7 @@ copy_substring(char *start, char *end)
 {
 	if (!start || !end || end <= start)
 		return NULL;
+
 	return strndup(start, end - start);
 }
 
