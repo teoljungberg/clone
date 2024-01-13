@@ -31,5 +31,3 @@ struct Repository extract_repository_from_cwd(char *clone_path, char *pattern);
 char *extract_location_from_repository(char *clone_path, struct Repository
     repository);
 char *extract_url_from_repository(struct Repository repository);
-
-char *extract_url_from_repository(struct Repository repository);
