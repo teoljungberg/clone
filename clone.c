@@ -19,13 +19,13 @@ struct Repository {
 };
 
 int
-valid_repository(struct Repository repository)
+invalid_repository(struct Repository repository)
 {
-	if (repository.host != NULL || repository.user != NULL ||
-	    repository.name != NULL)
-		return 0;
-	else
+	if (repository.host == NULL || repository.user == NULL ||
+	    repository.name == NULL)
 		return 1;
+	else
+		return 0;
 }
 
 char *
@@ -257,7 +257,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if (valid_repository(repository) != 0) {
+	if (invalid_repository(repository)) {
 		fprintf(stderr, "Could not extract repository from %s or pwd",
 		    pattern);
 		exit(1);
