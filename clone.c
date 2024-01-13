@@ -8,7 +8,7 @@
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: clone [-d] pattern\n");
+	fprintf(stderr, "usage: clone [-n] pattern\n");
 	exit(2);
 }
 
@@ -224,13 +224,13 @@ extract_url_from_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
-	int dflag = 0;
+	int nflag = 0;
 	int ch;
 
-	while ((ch = getopt(argc, argv, "d")) != -1) {
+	while ((ch = getopt(argc, argv, "n")) != -1) {
 		switch (ch) {
-		case 'd':
-			dflag = 1;
+		case 'n':
+			nflag = 1;
 			break;
 		default:
 			usage();
@@ -267,7 +267,7 @@ main(int argc, char *argv[])
 	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
-	if (dflag) {
+	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url,
 		    location);
 	} else {
