@@ -261,7 +261,7 @@ main(int argc, char *argv[])
 	}
 
 	if (invalid_repository(repository)) {
-		fprintf(stderr, "Could not extract repository from %s or cwd",
+		fprintf(stderr, "Could not extract repository from %s or cwd\n",
 		    pattern);
 		exit(1);
 	}
