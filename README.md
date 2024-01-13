@@ -28,6 +28,12 @@ git clone git@github.com:/user/another-repository /home/user/src/github.com/user
 % doas make install
 ```
 
+### Nix
+
+```
+% nix-env -i -f .
+```
+
 ## Help
 
 ```
