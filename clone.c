@@ -279,5 +279,11 @@ main(int argc, char *argv[])
 		    (char *const *)translated_clone_command);
 	}
 
+	free(location);
+	free(url);
+	free(repository.host);
+	free(repository.user);
+	free(repository.name);
+
 	return 0;
 }
