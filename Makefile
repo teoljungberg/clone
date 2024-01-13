@@ -1,7 +1,9 @@
 VERSION=	0.0.1
 
 PROG=	clone
-OBJS=	clone.o
+SRCS=	clone.c
+SRCS+=	repository.c
+OBJS=		${SRCS:.c=.o}
 
 PREFIX=		/usr/local
 MANPREFIX=	${PREFIX}/share/man
@@ -32,11 +34,11 @@ install: ${PROG}
 
 lint:
 	mandoc -Tlint -Wstyle ${PROG}.1
-	knfmt -ds ${PROG}.c
+	knfmt -ds ${SRCS}
 .PHONE :lint
 
 fmt:
-	knfmt -is ${PROG}.c
+	knfmt -is ${SRCS}
 	${MAKE} -C ${.CURDIR}/tests fmt
 .PHONY: fmt
 
