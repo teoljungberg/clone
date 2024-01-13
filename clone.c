@@ -45,11 +45,13 @@ valid_git_clone_url(char *pattern)
 		"git@*:*/*",
 	};
 
-	if (fnmatch(valid_patterns[0], pattern, 0) == 0 ||
-	    fnmatch(valid_patterns[1], pattern, 0) == 0)
-		return 1;
-	else
-		return 0;
+	for (size_t i = 0; i < sizeof(valid_patterns) /
+	    sizeof(valid_patterns[0]); i++) {
+		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
+			return 1;
+	}
+
+	return 0;
 }
 
 char *
