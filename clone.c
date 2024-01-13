@@ -52,21 +52,6 @@ valid_git_clone_url(char *pattern)
 		return 1;
 }
 
-int
-non_url_pattern(char *pattern)
-{
-	char *url_patterns[] = {
-		"https://*",
-		"git://*",
-	};
-
-	if (fnmatch(url_patterns[0], pattern, 0) == 0 ||
-	    fnmatch(url_patterns[1], pattern, 0) == 0)
-		return 1;
-	else
-		return 0;
-}
-
 char *
 copy_substring(char *start, char *end)
 {
@@ -264,8 +249,7 @@ main(int argc, char *argv[])
 
 	if (valid_git_clone_url(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
-	} else if (cwd_is_inside_clone_path(clone_path) == 0 &&
-	    non_url_pattern(pattern) == 0) {
+	} else if (cwd_is_inside_clone_path(clone_path) == 0) {
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern or cwd: %s\n",
