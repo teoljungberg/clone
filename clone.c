@@ -38,7 +38,7 @@ get_clone_path(void)
 }
 
 int
-valid_pattern(char *pattern)
+valid_git_clone_url(char *pattern)
 {
 	char *valid_patterns[] = {
 		"git@*:*/*.git",
@@ -262,7 +262,7 @@ main(int argc, char *argv[])
 
 	pattern = argv[0];
 
-	if (valid_pattern(pattern) == 0) {
+	if (valid_git_clone_url(pattern) == 0) {
 		repository = extract_repository_from_pattern(pattern);
 	} else if (cwd_is_inside_clone_path(clone_path) == 0 &&
 	    non_url_pattern(pattern) == 0) {
