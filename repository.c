@@ -169,9 +169,9 @@ extract_location_from_repository(char *clone_path, struct Repository repository)
 }
 
 char *
-extract_https_url_from_repository(struct Repository repository)
+extract_ssh_url_from_repository(struct Repository repository)
 {
-	char format[17] = "https://%s/%s/%s";
+	char format[13] = "git@%s:%s/%s";
 	int required_size;
 
 	required_size = snprintf(NULL, 0, format, repository.host,
@@ -191,9 +191,9 @@ extract_https_url_from_repository(struct Repository repository)
 }
 
 char *
-extract_ssh_url_from_repository(struct Repository repository)
+extract_https_url_from_repository(struct Repository repository)
 {
-	char format[13] = "git@%s:%s/%s";
+	char format[17] = "https://%s/%s/%s";
 	int required_size;
 
 	required_size = snprintf(NULL, 0, format, repository.host,
