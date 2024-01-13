@@ -9,7 +9,7 @@
 .Op Fl n
 .Ar pattern
 .Sh DESCRIPTION
-clone git repositories over ssh(1) into a specific directory structure.
+clone git repositories over ssh or https into a specific directory structure.
 The program is also directory aware, meaning it can understand and use the
 current directory structure to determine the clone path for a repository.
 .Sh REPOSITORY PATTERN
@@ -19,6 +19,10 @@ The program accepts the following patterns for the repository:
 git@host:user/repository
 .It
 git@host:user/repository.git
+.It
+https://host/user/repository
+.It
+https://host/user/repository.git
 .It
 user/repository
 .It
@@ -35,9 +39,13 @@ The default directory pattern for the cloned repositories is:
 When executed inside a project structure, the program uses the existing project
 path structure to determine the clone path.
 .Sh EXAMPLES
-To clone a repository from GitHub:
+To clone a repository from GitHub over ssh:
 .Pp
 .Dl % clone git@github.com:user/repository
+.Pp
+To clone a repository from GitHub over https:
+.Pp
+.Dl % clone https://github.com/user/repository
 .Pp
 To clone a repository from a custom git host:
 .Pp

@@ -12,17 +12,24 @@ usage(void)
 	exit(2);
 }
 
+enum Protocol {
+	UNDEFINED,
+	SSH,
+	HTTPS,
+};
+
 struct Repository {
 	char *host;
 	char *user;
 	char *name;
+	enum Protocol protocol;
 };
 
 int
 invalid_repository(struct Repository repository)
 {
 	if (repository.host == NULL || repository.user == NULL ||
-	    repository.name == NULL)
+	    repository.name == NULL || repository.protocol == UNDEFINED)
 		return 1;
 	else
 		return 0;
@@ -38,7 +45,7 @@ get_clone_path(void)
 }
 
 int
-valid_git_clone_url(char *pattern)
+valid_git_ssh_pattern(char *pattern)
 {
 	char *valid_patterns[] = {
 		"git@*:*/*.git",
@@ -54,6 +61,32 @@ valid_git_clone_url(char *pattern)
 	return 0;
 }
 
+int
+valid_git_https_pattern(char *pattern)
+{
+	char *valid_patterns[] = {
+		"https://*/*/*.git",
+		"https://*/*/*",
+	};
+
+	for (size_t i = 0; i < sizeof(valid_patterns) /
+	    sizeof(valid_patterns[0]); i++) {
+		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
+int
+valid_git_clone_url(char *pattern)
+{
+	if (valid_git_ssh_pattern(pattern) || valid_git_https_pattern(pattern))
+		return 1;
+	else
+		return 0;
+}
+
 char *
 copy_substring(char *start, char *end)
 {
@@ -63,30 +96,63 @@ copy_substring(char *start, char *end)
 	return strndup(start, end - start);
 }
 
-struct Repository
-extract_repository_from_pattern(char *pattern)
+void
+extract_repository_from_ssh_pattern(struct Repository *repository,
+    char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL};
-
-	if (!pattern)
-		return repository;
+	repository->protocol = SSH;
 
 	char *at = strchr(pattern, '@');
 	char *colon = strchr(pattern, ':');
 	char *slash = strchr(pattern, '/');
 
 	if (at && colon && at < colon)
-		repository.host = copy_substring(at + 1, colon);
+		repository->host = copy_substring(at + 1, colon);
 
 	if (colon && slash && colon < slash)
-		repository.user = copy_substring(colon + 1, slash);
+		repository->user = copy_substring(colon + 1, slash);
 
 	if (slash) {
 		char *end = strstr(slash, ".git");
 		if (!end)
 			end = pattern + strlen(pattern);
-		repository.name = copy_substring(slash + 1, end);
+		repository->name = copy_substring(slash + 1, end);
 	}
+}
+
+void
+extract_repository_from_https_pattern(struct Repository *repository,
+    char *pattern)
+{
+	repository->protocol = HTTPS;
+
+	char *host_start = strstr(pattern, "://") + 3;
+	char *host_end = strchr(host_start, '/');
+	repository->host = copy_substring(host_start, host_end);
+
+	char *user_start = host_end + 1;
+	char *user_end = strchr(user_start, '/');
+	repository->user = copy_substring(user_start, user_end);
+
+	char *name_start = user_end + 1;
+	char *name_end = strstr(name_start, ".git");
+	if (!name_end)
+		name_end = pattern + strlen(pattern);
+	repository->name = copy_substring(name_start, name_end);
+}
+
+struct Repository
+extract_repository_from_pattern(char *pattern)
+{
+	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
+
+	if (!pattern)
+		return repository;
+
+	if (valid_git_ssh_pattern(pattern))
+		extract_repository_from_ssh_pattern(&repository, pattern);
+	else if (valid_git_https_pattern(pattern))
+		extract_repository_from_https_pattern(&repository, pattern);
 
 	return repository;
 }
@@ -143,7 +209,7 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 struct Repository
 extract_repository_from_cwd(char *clone_path, char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL};
+	struct Repository repository = {NULL, NULL, NULL, SSH};
 
 	char cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
@@ -202,7 +268,7 @@ extract_location_from_repository(char *clone_path, struct Repository repository)
 }
 
 char *
-extract_url_from_repository(struct Repository repository)
+extract_ssh_url_from_repository(struct Repository repository)
 {
 	char format[13] = "git@%s:%s/%s";
 	int required_size;
@@ -221,6 +287,39 @@ extract_url_from_repository(struct Repository repository)
 	    repository.user, repository.name);
 
 	return out;
+}
+
+char *
+extract_https_url_from_repository(struct Repository repository)
+{
+	char format[17] = "https://%s/%s/%s";
+	int required_size;
+
+	required_size = snprintf(NULL, 0, format, repository.host,
+	    repository.user, repository.name);
+
+	if (required_size < 0)
+		return NULL;
+
+	char *out = malloc(required_size + 1);
+	if (!out)
+		return NULL;
+
+	snprintf(out, required_size + 1, format, repository.host,
+	    repository.user, repository.name);
+
+	return out;
+}
+
+char *
+extract_url_from_repository(struct Repository repository)
+{
+	if (repository.protocol == HTTPS)
+		return extract_https_url_from_repository(repository);
+	else if (repository.protocol == SSH)
+		return extract_ssh_url_from_repository(repository);
+	else
+		return NULL;
 }
 
 int
