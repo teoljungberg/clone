@@ -55,22 +55,6 @@ extract_repository_from_https_pattern(struct Repository *repository,
 	repository->name = copy_substring(name_start, name_end);
 }
 
-struct Repository
-extract_repository_from_pattern(char *pattern)
-{
-	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
-
-	if (!pattern)
-		return repository;
-
-	if (valid_git_ssh_pattern(pattern))
-		extract_repository_from_ssh_pattern(&repository, pattern);
-	else if (valid_git_https_pattern(pattern))
-		extract_repository_from_https_pattern(&repository, pattern);
-
-	return repository;
-}
-
 void
 overload_repository_with_pattern(struct Repository *repository, char *pattern)
 {
@@ -105,6 +89,22 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 		else
 			repository->name = strdup(pattern);
 	}
+}
+
+struct Repository
+extract_repository_from_pattern(char *pattern)
+{
+	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
+
+	if (!pattern)
+		return repository;
+
+	if (valid_git_ssh_pattern(pattern))
+		extract_repository_from_ssh_pattern(&repository, pattern);
+	else if (valid_git_https_pattern(pattern))
+		extract_repository_from_https_pattern(&repository, pattern);
+
+	return repository;
 }
 
 struct Repository
