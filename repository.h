@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#ifndef REPOSITORY_H
+#define REPOSITORY_H 1
+
 enum Protocol {
 	UNDEFINED,
 	SSH,
@@ -28,3 +31,5 @@ void overload_repository_with_pattern(struct Repository *repository, char
 char *extract_location_from_repository(char *clone_path, struct Repository
     repository);
 char *extract_url_from_repository(struct Repository repository);
+
+#endif
