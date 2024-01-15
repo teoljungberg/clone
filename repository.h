@@ -17,8 +17,6 @@ struct Repository {
 	enum Protocol protocol;
 };
 
-int invalid_repository(struct Repository repository);
-
 char *copy_substring(char *start, char *end);
 
 struct Repository extract_repository_from_pattern(char *pattern);
