@@ -7,5 +7,6 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)/
 CLONE="$ROOT/clone"
 
 clone() {
-  "$CLONE" -n "$@"
+  # redirect stderr to stdout
+  "$CLONE" -n "$@" 2>&1
 }

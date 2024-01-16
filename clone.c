@@ -61,6 +61,23 @@ valid_git_clone_url(char *pattern)
 }
 
 int
+unsupported_git_clone_patterns(char *pattern)
+{
+	char *invalid_patterns[] = {
+		"git://*/*",
+		"git://*/*.git",
+	};
+
+	for (size_t i = 0; i < sizeof(invalid_patterns) /
+	    sizeof(invalid_patterns[0]); i++) {
+		if (fnmatch(invalid_patterns[i], pattern, 0) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
+int
 cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[1024];
@@ -112,7 +129,8 @@ main(int argc, char *argv[])
 
 	if (valid_git_clone_url(pattern)) {
 		repository = extract_repository_from_pattern(pattern);
-	} else if (cwd_is_inside_clone_path(clone_path)) {
+	} else if (cwd_is_inside_clone_path(clone_path) &&
+	    !unsupported_git_clone_patterns(pattern)) {
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	} else {
 		fprintf(stderr, "Invalid repository pattern or cwd: %s\n",

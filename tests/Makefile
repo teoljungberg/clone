@@ -1,5 +1,6 @@
 TESTS+=	clone-inside-project-base-directory.sh
 TESTS+=	clone-outside-project-base-directory.sh
+TESTS+=	clone-rejects-bad-patterns.sh
 
 all: test
 
