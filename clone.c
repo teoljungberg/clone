@@ -66,6 +66,8 @@ unsupported_git_clone_patterns(char *pattern)
 	char *invalid_patterns[] = {
 		"git://*/*",
 		"git://*/*.git",
+		"ssh://git@*/*",
+		"ssh://git@*/*.git",
 	};
 
 	for (size_t i = 0; i < sizeof(invalid_patterns) /
