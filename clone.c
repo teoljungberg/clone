@@ -52,15 +52,6 @@ valid_git_https_pattern(char *pattern)
 }
 
 int
-valid_git_clone_url(char *pattern)
-{
-	if (valid_git_ssh_pattern(pattern) || valid_git_https_pattern(pattern))
-		return 1;
-	else
-		return 0;
-}
-
-int
 unsupported_git_clone_patterns(char *pattern)
 {
 	char *invalid_patterns[] = {
@@ -77,6 +68,17 @@ unsupported_git_clone_patterns(char *pattern)
 	}
 
 	return 0;
+}
+
+int
+valid_git_clone_url(char *pattern)
+{
+	if (valid_git_ssh_pattern(pattern) || valid_git_https_pattern(pattern))
+		return 1;
+	else if (unsupported_git_clone_patterns(pattern))
+		return 1;
+	else
+		return 0;
 }
 
 int
@@ -122,26 +124,21 @@ main(int argc, char *argv[])
 
 	char *clone_path = get_clone_path();
 	char *location, *pattern, *url;
-	struct Repository repository;
+	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
 
 	if (argc != 1)
 		usage();
 
 	pattern = argv[0];
 
-	if (valid_git_clone_url(pattern)) {
+	if (valid_git_clone_url(pattern))
 		repository = extract_repository_from_pattern(pattern);
-	} else if (cwd_is_inside_clone_path(clone_path) &&
-	    !unsupported_git_clone_patterns(pattern)) {
+	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
-	} else {
-		fprintf(stderr, "Invalid repository pattern or cwd: %s\n",
-		    pattern);
-		exit(1);
-	}
 
 	if (invalid_repository(repository)) {
-		fprintf(stderr, "Could not extract repository from %s or cwd\n",
+		fprintf(stderr,
+		    "Could not extract repository from pattern or cwd: %s\n",
 		    pattern);
 		exit(1);
 	}
