@@ -1,8 +1,10 @@
 VERSION=	0.0.1
 
 PROG=	clone
+
 SRCS=	clone.c
 SRCS+=	repository.c
+
 OBJS=		${SRCS:.c=.o}
 
 PREFIX=		/usr/local
