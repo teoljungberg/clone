@@ -135,7 +135,6 @@ main(int argc, char *argv[])
 		repository = extract_repository_from_pattern(pattern);
 	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
-
 	if (invalid_repository(repository)) {
 		fprintf(stderr,
 		    "Could not extract repository from pattern or cwd: %s\n",
@@ -147,11 +146,10 @@ main(int argc, char *argv[])
 	url = extract_url_from_repository(repository);
 
 	if (nflag) {
-		fprintf(stdout, "%s %s %s\n", "git clone", url,
-		    location);
+		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
 	} else {
-		const char *translated_clone_command[] = { "git",
-			"clone", url, location, NULL };
+		const char *translated_clone_command[] = { "git", "clone", url,
+			location, NULL };
 		execvp(translated_clone_command[0],
 		    (char *const *)translated_clone_command);
 	}
