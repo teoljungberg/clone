@@ -32,4 +32,6 @@ char *extract_location_from_repository(char *clone_path, struct Repository
     repository);
 char *extract_url_from_repository(struct Repository repository);
 
+void free_repository(struct Repository *repository);
+
 #endif

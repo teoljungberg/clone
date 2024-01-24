@@ -156,9 +156,7 @@ main(int argc, char *argv[])
 
 	free(location);
 	free(url);
-	free(repository.host);
-	free(repository.user);
-	free(repository.name);
+	free_repository(&repository);
 
 	return 0;
 }

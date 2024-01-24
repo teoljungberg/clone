@@ -222,3 +222,11 @@ extract_url_from_repository(struct Repository repository)
 	else
 		return NULL;
 }
+
+void
+free_repository(struct Repository *repository)
+{
+	free(repository->host);
+	free(repository->user);
+	free(repository->name);
+}
