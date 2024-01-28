@@ -20,8 +20,6 @@ struct Repository {
 	enum Protocol protocol;
 };
 
-char *copy_substring(char *start, char *end);
-
 struct Repository extract_repository_from_pattern(char *pattern);
 struct Repository extract_repository_from_cwd(char *clone_path, char *pattern);
 
