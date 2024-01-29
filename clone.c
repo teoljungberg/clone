@@ -135,6 +135,7 @@ main(int argc, char *argv[])
 		repository = extract_repository_from_pattern(pattern);
 	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
+
 	if (invalid_repository(repository)) {
 		fprintf(stderr,
 		    "Could not extract repository from pattern or cwd: %s\n",
