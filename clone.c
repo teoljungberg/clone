@@ -85,10 +85,10 @@ int
 cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[1024];
+
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return 0;
-
-	if (strstr(cwd, clone_path) != NULL)
+	else if (strstr(cwd, clone_path) != NULL)
 		return 1;
 	else
 		return 0;

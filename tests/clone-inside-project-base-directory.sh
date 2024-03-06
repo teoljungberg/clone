@@ -27,7 +27,7 @@ if testcase "clone full https github.com URLs inside clone's directory structure
     "$(clone "https://github.com/user/project.git")"
 fi
 
-if testcase "clone user/repository name patterns inside clone's directory structure"; then
+if testcase "clone user/repository_name patterns inside clone's directory structure"; then
   assert_eq \
     "git clone git@github.com:another-user/project $HOME/src//github.com/another-user/project" \
     "$(clone "another-user/project")"
@@ -45,4 +45,12 @@ if testcase "clone repository_name patterns inside a user's clone directory stru
   assert_eq \
     "git clone git@github.com:$user/project $HOME/src//github.com/$user/project" \
     "$(clone "project.git")"
+fi
+
+if testcase "clone user/repository_name patterns inside a host of a clone directory structure"; then
+  cd "$HOME/src/github.com" || exit 1
+
+  assert_eq \
+    "git clone git@github.com:another-user/project $HOME/src//github.com/another-user/project" \
+    "$(clone "another-user/project")"
 fi
