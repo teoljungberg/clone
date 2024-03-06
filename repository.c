@@ -119,8 +119,9 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	char *start = strstr(cwd, clone_path);
 	if (!start)
 		return repository;
+	
+	// Extract repository host
 	start += strlen(clone_path);
-
 	char *end = strchr(start, '/');
 	if (end) {
 		repository.host = copy_substring(start, end);
@@ -129,12 +130,14 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		repository.host = strdup(start);
 	}
 
+	// Extract repository user
 	end = strchr(start, '/');
 	if (end) {
 		repository.user = copy_substring(start, end);
 		start = end + 1;
 	}
 
+	// Extract repository name
 	end = strchr(start, '/');
 	if (!end)
 		end = strstr(start, ".git");
@@ -143,6 +146,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	else
 		repository.name = strdup(start);
 
+	// Overload repository with pattern with user and repository name as
+	// needed from the pattern
 	overload_repository_with_pattern(&repository, pattern);
 
 	return repository;
