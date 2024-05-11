@@ -25,7 +25,7 @@ git clone git@github.com:/user/another-repository /home/user/src/github.com/user
 ### UNIX
 
 ```
-% doas make install
+# make install
 ```
 
 ### Nix
