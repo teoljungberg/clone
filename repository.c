@@ -135,6 +135,9 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	if (end) {
 		repository.user = copy_substring(start, end);
 		start = end + 1;
+	} else {
+		repository.user = strdup(start);
+		start = start + strlen(start);
 	}
 
 	// Extract repository name

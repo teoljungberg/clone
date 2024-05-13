@@ -36,8 +36,10 @@ if testcase "clone user/repository_name patterns inside clone's directory struct
     "$(clone "another-user/project.git")"
 fi
 
-if testcase "clone repository_name patterns inside a user's clone directory structure"; then
-  user=$(basename $(dirname $ROOT))
+if testcase "FOCUS clone repository_name patterns inside a user's clone directory structure"; then
+  prior=$(pwd)
+  user=$(basename "$(dirname "$ROOT")")
+  cd "$HOME/src/github.com/$user" || exit 1
 
   assert_eq \
     "git clone git@github.com:$user/project $HOME/src//github.com/$user/project" \
@@ -45,6 +47,8 @@ if testcase "clone repository_name patterns inside a user's clone directory stru
   assert_eq \
     "git clone git@github.com:$user/project $HOME/src//github.com/$user/project" \
     "$(clone "project.git")"
+
+  cd "$prior" || exit 1
 fi
 
 if testcase "clone user/repository_name patterns inside a host of a clone directory structure"; then
