@@ -119,7 +119,7 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	char *start = strstr(cwd, clone_path);
 	if (!start)
 		return repository;
-	
+
 	// Extract repository host
 	start += strlen(clone_path);
 	char *end = strchr(start, '/');
