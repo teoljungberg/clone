@@ -22,9 +22,9 @@ git clone git@github.com:/user/another-repository /home/user/src/github.com/user
 
 ### CDPATH
 
-It is highly recommended to set the `CDPATH` environment variable to the
-different hosts you have repositories on. This allows for quick access due to
-the known directory structure.
+It is recommended to set the `CDPATH` environment variable to the different
+hosts you have repositories from. This allows for quick access and quick cloning
+due to the known directory structure of clone(1).
 
 ```
 % CDPATH=$HOME/src/github.com
