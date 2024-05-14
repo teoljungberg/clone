@@ -1,0 +1,37 @@
+name: test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    name: ${{ matrix.os }} + ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: make
+      run: |
+        mkdir -p $HOME/src/github.com/user/clone
+        cp -R * $HOME/src/github.com/user/clone
+        cd $HOME/src/github.com/user/clone
+
+        CC=${{ matrix.compiler }} make
+
+    - name: make test
+      run: |
+        cd $HOME/src/github.com/user/clone
+
+        CC=${{ matrix.compiler }} make test
