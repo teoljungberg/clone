@@ -36,7 +36,7 @@ if testcase "clone user/repository_name patterns inside clone's directory struct
     "$(clone "another-user/project.git")"
 fi
 
-if testcase "FOCUS clone repository_name patterns inside a user's clone directory structure"; then
+if testcase "clone repository_name patterns inside a user's clone directory structure"; then
   prior=$(pwd)
   user=$(basename "$(dirname "$ROOT")")
   cd "$HOME/src/github.com/$user" || exit 1
