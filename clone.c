@@ -11,10 +11,13 @@ usage(void)
 char *
 get_clone_path(void)
 {
-	char *clone_path = getenv("HOME");
-	strcat(clone_path, "/src/");
-
-	return clone_path;
+	if (getenv("CLONE_PATH") != NULL) {
+		return getenv("CLONE_PATH");
+	} else {
+		char *clone_path = getenv("HOME");
+		strcat(clone_path, "/src/");
+		return clone_path;
+	}
 }
 
 int
