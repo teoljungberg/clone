@@ -52,9 +52,22 @@ if testcase "clone repository_name patterns inside a user's clone directory stru
 fi
 
 if testcase "clone user/repository_name patterns inside a host of a clone directory structure"; then
+  prior=$(pwd)
   cd "$HOME/src/github.com" || exit 1
 
   assert_eq \
     "git clone git@github.com:another-user/project $HOME/src//github.com/another-user/project" \
     "$(clone "another-user/project")"
+
+  cd "$prior" || exit 1
+fi
+
+if testcase "clone full https github.com URLs with a preconfigured CLONE_PATH"; then
+  export CLONE_PATH="$HOME/Projects/"
+
+  assert_eq \
+    "git clone git@github.com:user/project $CLONE_PATH/github.com/user/project" \
+    "$(clone "git@github.com:user/project")"
+
+  unset CLONE_PATH
 fi
