@@ -64,8 +64,10 @@ fi
 
 if testcase "clone full https github.com URLs with a preconfigured CLONE_PATH"; then
   export CLONE_PATH="$HOME/Projects/"
+
   assert_eq \
     "git clone git@github.com:user/project $CLONE_PATH/github.com/user/project" \
     "$(clone "git@github.com:user/project")"
+
   unset CLONE_PATH
 fi
