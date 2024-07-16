@@ -2,6 +2,8 @@ VERSION=	0.0.1
 
 PROG=	clone
 
+CLONE_PATH?=	${HOME}/src/
+
 SRCS=	clone.c
 SRCS+=	repository.c
 
@@ -15,6 +17,7 @@ INSTALL_MAN=		install -m 0644
 
 CFLAGS+=	-pedantic -Wall -Wextra
 CFLAGS+=	-DVERSION=\"${VERSION}\"
+CFLAGS+=	-DCLONE_PATH=\"${CLONE_PATH}\"
 # Uncomment to enable debugging
 # CFLAGS+=	-g -DDEBUG=1
 
