@@ -8,15 +8,6 @@ usage(void)
 	exit(2);
 }
 
-char *
-get_clone_path(void)
-{
-	char *clone_path = getenv("HOME");
-	strcat(clone_path, "/src/");
-
-	return clone_path;
-}
-
 int
 valid_git_ssh_pattern(char *pattern)
 {
@@ -122,7 +113,7 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	char *clone_path = get_clone_path();
+	char *clone_path = CLONE_PATH;
 	char *location, *pattern, *url;
 	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
 
