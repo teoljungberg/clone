@@ -11,8 +11,19 @@ usage(void)
 char *
 get_clone_path(void)
 {
-	char *clone_path = getenv("HOME");
-	strcat(clone_path, "/src/");
+	char *home = strdup(getenv("HOME"));
+	if (home == NULL)
+		exit(1);
+	
+	size_t clone_path_len = strlen(home) + strlen("/src/") + 1;
+	char *clone_path = malloc(clone_path_len);
+
+	if (clone_path == NULL) {
+		free(home);
+		exit(1);
+	}
+
+	snprintf(clone_path, clone_path_len, "%s/src/", home);
 
 	return clone_path;
 }
@@ -140,6 +151,7 @@ main(int argc, char *argv[])
 		fprintf(stderr,
 		    "Could not extract repository from pattern or cwd: %s\n",
 		    pattern);
+		free(clone_path);
 		exit(1);
 	}
 
@@ -155,6 +167,7 @@ main(int argc, char *argv[])
 		    (char *const *)translated_clone_command);
 	}
 
+	free(clone_path);
 	free(location);
 	free(url);
 	free_repository(&repository);
