@@ -24,7 +24,7 @@ get_clone_path(void)
 	}
 
 	snprintf(clone_path, clone_path_len, "%s/src/", home);
-
+	free(home);
 	return clone_path;
 }
 
@@ -152,6 +152,7 @@ main(int argc, char *argv[])
 		    "Could not extract repository from pattern or cwd: %s\n",
 		    pattern);
 		free(clone_path);
+		free_repository(&repository);
 		exit(1);
 	}
 
