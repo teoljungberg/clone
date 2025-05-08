@@ -14,10 +14,18 @@ git clone git@github.com:/user/repository /home/user/src/github.com/user/reposit
 or
 
 ```
-% pwd
-/home/user/src/github.com/user
+% cd /home/user/src/github.com/user
 % clone -n another-repository
-git clone git@github.com:/user/another-repository /home/user/src/github.com/user/antother-repository
+git clone git@github.com:/user/another-repository /home/user/src/github.com/user/another-repository
+```
+
+or
+
+```
+% cd /home/user/src/github.com/
+/home/user/src/github.com/
+% clone -n user/repository
+git clone git@github.com:/user/repository /home/user/src/github.com/user/repository
 ```
 
 ### CDPATH
