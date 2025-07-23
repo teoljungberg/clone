@@ -8,24 +8,57 @@ usage(void)
 	exit(2);
 }
 
+#ifndef CLONE_PATH
+#define CLONE_PATH "~/src"
+#endif
+
+char *
+expand_tilde(const char *path)
+{
+	if (path[0] != '~')
+		return strdup(path);
+
+	char *home = getenv("HOME");
+	if (home == NULL)
+		return strdup(path);
+
+	size_t home_len = strlen(home);
+	size_t path_len = strlen(path);
+	size_t total_len = home_len +
+	    path_len; // -1 for ~ +1 for null terminator
+
+	char *expanded = malloc(total_len);
+	if (expanded == NULL)
+		return NULL;
+
+	strcpy(expanded, home);
+	strcat(expanded, path + 1); // Skip the ~
+
+	return expanded;
+}
+
 char *
 get_clone_path(void)
 {
-	char *home = strdup(getenv("HOME"));
-	if (home == NULL)
+	char *expanded = expand_tilde(CLONE_PATH);
+	if (expanded == NULL)
 		exit(1);
-	
-	size_t clone_path_len = strlen(home) + strlen("/src/") + 1;
-	char *clone_path = malloc(clone_path_len);
 
-	if (clone_path == NULL) {
-		free(home);
-		exit(1);
+	// Ensure it ends with a slash
+	size_t len = strlen(expanded);
+	if (len > 0 && expanded[len - 1] != '/') {
+		char *with_slash = malloc(len + 2);
+		if (with_slash == NULL) {
+			free(expanded);
+			exit(1);
+		}
+		strcpy(with_slash, expanded);
+		strcat(with_slash, "/");
+		free(expanded);
+		expanded = with_slash;
 	}
 
-	snprintf(clone_path, clone_path_len, "%s/src/", home);
-	free(home);
-	return clone_path;
+	return expanded;
 }
 
 int

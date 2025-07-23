@@ -35,6 +35,18 @@ directory structure.
 The default directory pattern for the cloned repositories is:
 .Pp
 .Dl $HOME/src/host/user/repository
+.Pp
+The clone path can be configured at compile time using the
+.Ev CLONE_PATH
+variable.
+For example:
+.Pp
+.Dl % make CLONE_PATH=~/projects
+.Pp
+This supports both tilde expansion and absolute paths:
+.Pp
+.Dl % make CLONE_PATH=~/dev/repositories
+.Dl % make CLONE_PATH=/opt/code
 .Sh DIRECTORY AWARENESS
 When executed inside a project structure, the program uses the existing project
 path structure to determine the clone path.
@@ -60,5 +72,11 @@ To clone a repository while inside the directory structure:
 To output the git clone command without executing it:
 .Pp
 .Dl % clone -n git@github.com:user/repository
+.Pp
+To build with a custom clone path:
+.Pp
+.Dl % make CLONE_PATH=~/projects
+.Dl % ./clone git@github.com:user/repository
+.Dl   # Clones to ~/projects/github.com/user/repository
 .Sh AUTHORS
 .An Teo Ljungberg <teo@teoljungberg.com>

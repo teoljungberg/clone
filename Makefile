@@ -1,4 +1,5 @@
 VERSION=	0.0.1
+CLONE_PATH?=	~/src
 
 PROG=	clone
 
@@ -15,6 +16,7 @@ INSTALL_MAN=		install -m 0644
 
 CFLAGS+=	-pedantic -Wall -Wextra
 CFLAGS+=	-DVERSION=\"${VERSION}\"
+CFLAGS+=	-DCLONE_PATH=\"${CLONE_PATH}\"
 # Uncomment to enable debugging
 # CFLAGS+=	-g -DDEBUG=1
 
