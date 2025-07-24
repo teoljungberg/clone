@@ -40,6 +40,11 @@ expand_tilde(const char *path)
 char *
 get_clone_path(void)
 {
+	static char *cached_path = NULL;
+
+	if (cached_path != NULL)
+		return strdup(cached_path);
+
 	char *expanded = expand_tilde(CLONE_PATH);
 	if (expanded == NULL)
 		exit(1);
@@ -58,7 +63,9 @@ get_clone_path(void)
 		expanded = with_slash;
 	}
 
-	return expanded;
+	free(cached_path);
+	cached_path = expanded;
+	return strdup(cached_path);
 }
 
 int
