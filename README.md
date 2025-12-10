@@ -54,19 +54,19 @@ Note: If you've configured a custom `CLONE_PATH`, adjust your `CDPATH` according
 
 The default clone path is `~/src`, but it can be customized at compile time:
 
-Custom path, clones to ~/projects/github.com/user/repository
+Custom path, clones to `~/projects/github.com/user/repository`
 
 ```
 % make CLONE_PATH=~/projects
 ```
 
-Nested path, clones to ~/dev/code/github.com/user/repository
+Nested path, clones to `~/dev/code/github.com/user/repository`
 
 ```
 % make CLONE_PATH=~/dev/code
 ```
 
-Absolute path, clones to /opt/repositories/github.com/user/repository
+Absolute path, clones to `/opt/repositories/github.com/user/repository`
 
 ```
 % make CLONE_PATH=/opt/repositories
