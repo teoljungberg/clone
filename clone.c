@@ -162,6 +162,18 @@ cwd_is_inside_clone_path(const char *clone_path)
 	return 1;
 }
 
+static int
+contains_path_traversal(const char *str)
+{
+	if (str == NULL)
+		return 1;
+	if (strstr(str, "..") != NULL)
+		return 1;
+	if (strchr(str, '/') != NULL)
+		return 1;
+	return 0;
+}
+
 int
 invalid_repository(struct Repository repository)
 {
@@ -170,6 +182,9 @@ invalid_repository(struct Repository repository)
 		return 1;
 	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
 	    repository.name[0] == '\0')
+		return 1;
+	if (contains_path_traversal(repository.user) ||
+	    contains_path_traversal(repository.name))
 		return 1;
 	return 0;
 }
