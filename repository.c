@@ -1,6 +1,23 @@
 #include "clone.h"
 #include "repository.h"
 
+/*
+ * Find ".git" suffix at end of string.
+ * Returns pointer to the suffix, or NULL if not present.
+ */
+static char *
+find_git_suffix(char *str)
+{
+	size_t len;
+
+	if (str == NULL)
+		return NULL;
+	len = strlen(str);
+	if (len >= 4 && strcmp(str + len - 4, ".git") == 0)
+		return str + len - 4;
+	return NULL;
+}
+
 char *
 copy_substring(char *start, char *end)
 {
@@ -30,7 +47,7 @@ extract_repository_from_ssh_pattern(struct Repository *repository,
 		repository->user = copy_substring(colon + 1, slash);
 
 	if (slash) {
-		char *end = strstr(slash, ".git");
+		char *end = find_git_suffix(slash);
 		if (!end)
 			end = pattern + strlen(pattern);
 		repository->name = copy_substring(slash + 1, end);
@@ -59,7 +76,7 @@ extract_repository_from_https_pattern(struct Repository *repository,
 	repository->user = copy_substring(user_start, user_end);
 
 	char *name_start = user_end + 1;
-	char *name_end = strstr(name_start, ".git");
+	char *name_end = find_git_suffix(name_start);
 	if (!name_end)
 		name_end = pattern + strlen(pattern);
 	repository->name = copy_substring(name_start, name_end);
@@ -82,7 +99,7 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 			repository->user = copy_substring(start, end);
 
 			start = end + 1;
-			end = strstr(start, ".git");
+			end = find_git_suffix(start);
 
 			free(repository->name);
 			if (end)
@@ -94,7 +111,7 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 		}
 	} else {
 		free(repository->name);
-		end = strstr(pattern, ".git");
+		end = find_git_suffix(pattern);
 		if (end)
 			repository->name = copy_substring(pattern, end);
 		else
@@ -159,7 +176,7 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 
 	end = strchr(start, '/');
 	if (!end)
-		end = strstr(start, ".git");
+		end = find_git_suffix(start);
 	if (end) {
 		repository.name = copy_substring(start, end);
 	} else {
