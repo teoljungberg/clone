@@ -54,11 +54,15 @@ char *
 get_clone_path(void)
 {
 	static char *cached_path = NULL;
-	char *expanded;
+	char *expanded, *result;
 	size_t len;
 
-	if (cached_path != NULL)
-		return strdup(cached_path);
+	if (cached_path != NULL) {
+		result = strdup(cached_path);
+		if (result == NULL)
+			err(1, NULL);
+		return result;
+	}
 
 	expanded = expand_tilde(CLONE_PATH);
 	if (expanded == NULL)
@@ -70,7 +74,10 @@ get_clone_path(void)
 		expanded[len - 1] = '\0';
 
 	cached_path = expanded;
-	return strdup(cached_path);
+	result = strdup(cached_path);
+	if (result == NULL)
+		err(1, NULL);
+	return result;
 }
 
 int
