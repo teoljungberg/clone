@@ -157,8 +157,10 @@ invalid_repository(struct Repository repository)
 	if (repository.host == NULL || repository.user == NULL ||
 	    repository.name == NULL || repository.protocol == UNDEFINED)
 		return 1;
-	else
-		return 0;
+	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
+	    repository.name[0] == '\0')
+		return 1;
+	return 0;
 }
 
 int
