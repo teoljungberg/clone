@@ -12,6 +12,6 @@
 
 int	valid_git_ssh_pattern(char *);
 int	valid_git_https_pattern(char *);
-int	valid_git_clone_url(char *);
+int	is_url_pattern(char *);
 
 #endif /* _CLONE_H_ */

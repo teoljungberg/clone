@@ -134,14 +134,11 @@ unsupported_git_clone_patterns(char *pattern)
 }
 
 int
-valid_git_clone_url(char *pattern)
+is_url_pattern(char *pattern)
 {
-	if (valid_git_ssh_pattern(pattern) || valid_git_https_pattern(pattern))
-		return 1;
-	else if (unsupported_git_clone_patterns(pattern))
-		return 1;
-	else
-		return 0;
+	return valid_git_ssh_pattern(pattern) ||
+	    valid_git_https_pattern(pattern) ||
+	    unsupported_git_clone_patterns(pattern);
 }
 
 int
@@ -206,7 +203,7 @@ main(int argc, char *argv[])
 
 	pattern = argv[0];
 
-	if (valid_git_clone_url(pattern))
+	if (is_url_pattern(pattern))
 		repository = extract_repository_from_pattern(pattern);
 	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
