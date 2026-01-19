@@ -194,6 +194,7 @@ int
 main(int argc, char *argv[])
 {
 	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
+	char *cmd[] = { "git", "clone", NULL, NULL, NULL };
 	char *clone_path, *location, *pattern, *url;
 	int nflag = 0;
 	int ch;
@@ -240,8 +241,8 @@ main(int argc, char *argv[])
 		return 0;
 	}
 
-	char *const cmd[] = { "git", "clone", url, location, NULL };
-
+	cmd[2] = url;
+	cmd[3] = location;
 	execvp(cmd[0], cmd);
 	err(1, "git");
 }

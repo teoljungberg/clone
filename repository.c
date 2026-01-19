@@ -109,7 +109,7 @@ overload_repository_with_pattern(struct Repository *repository,
 		/* pattern has both user and repository name */
 		start = pattern;
 		end = strchr(pattern, '/');
-		if (end) {
+		if (end != NULL) {
 			free(repository->user);
 			repository->user = copy_substring(start, end);
 
@@ -117,7 +117,7 @@ overload_repository_with_pattern(struct Repository *repository,
 			end = find_git_suffix(start);
 
 			free(repository->name);
-			if (end)
+			if (end != NULL)
 				repository->name = copy_substring(start, end);
 			else
 				repository->name = strdup(start);
@@ -127,7 +127,7 @@ overload_repository_with_pattern(struct Repository *repository,
 	} else {
 		free(repository->name);
 		end = find_git_suffix(pattern);
-		if (end)
+		if (end != NULL)
 			repository->name = copy_substring(pattern, end);
 		else
 			repository->name = strdup(pattern);
@@ -171,7 +171,7 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	if (*start == '/')
 		start++;
 	end = strchr(start, '/');
-	if (end) {
+	if (end != NULL) {
 		repository.host = copy_substring(start, end);
 		start = end + 1;
 	} else {
@@ -181,7 +181,7 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	}
 
 	end = strchr(start, '/');
-	if (end) {
+	if (end != NULL) {
 		repository.user = copy_substring(start, end);
 		start = end + 1;
 	} else {
