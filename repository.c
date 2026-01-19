@@ -206,18 +206,20 @@ char *
 extract_location_from_repository(char *clone_path, struct Repository repository)
 {
 	char *out;
-	int required_size;
+	int len;
+	size_t size;
 
-	required_size = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path,
+	len = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path,
 	    repository.host, repository.user, repository.name);
-	if (required_size < 0)
+	if (len < 0 || (size_t)len >= SIZE_MAX)
 		return NULL;
 
-	out = malloc(required_size + 1);
+	size = (size_t)len + 1;
+	out = malloc(size);
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, "%s/%s/%s/%s", clone_path,
+	snprintf(out, size, "%s/%s/%s/%s", clone_path,
 	    repository.host, repository.user, repository.name);
 
 	return out;
@@ -227,18 +229,20 @@ char *
 extract_ssh_url_from_repository(struct Repository repository)
 {
 	char *out;
-	int required_size;
+	int len;
+	size_t size;
 
-	required_size = snprintf(NULL, 0, "git@%s:%s/%s", repository.host,
+	len = snprintf(NULL, 0, "git@%s:%s/%s", repository.host,
 	    repository.user, repository.name);
-	if (required_size < 0)
+	if (len < 0 || (size_t)len >= SIZE_MAX)
 		return NULL;
 
-	out = malloc(required_size + 1);
+	size = (size_t)len + 1;
+	out = malloc(size);
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, "git@%s:%s/%s", repository.host,
+	snprintf(out, size, "git@%s:%s/%s", repository.host,
 	    repository.user, repository.name);
 
 	return out;
@@ -248,18 +252,20 @@ char *
 extract_https_url_from_repository(struct Repository repository)
 {
 	char *out;
-	int required_size;
+	int len;
+	size_t size;
 
-	required_size = snprintf(NULL, 0, "https://%s/%s/%s", repository.host,
+	len = snprintf(NULL, 0, "https://%s/%s/%s", repository.host,
 	    repository.user, repository.name);
-	if (required_size < 0)
+	if (len < 0 || (size_t)len >= SIZE_MAX)
 		return NULL;
 
-	out = malloc(required_size + 1);
+	size = (size_t)len + 1;
+	out = malloc(size);
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, "https://%s/%s/%s", repository.host,
+	snprintf(out, size, "https://%s/%s/%s", repository.host,
 	    repository.user, repository.name);
 
 	return out;
