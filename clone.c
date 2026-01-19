@@ -237,5 +237,11 @@ main(int argc, char *argv[])
 	char *const cmd[] = { "git", "clone", url, location, NULL };
 
 	execvp(cmd[0], cmd);
+
+	/* execvp only returns on failure */
+	free(clone_path);
+	free(location);
+	free(url);
+	free_repository(&repository);
 	err(1, "git");
 }
