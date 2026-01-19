@@ -21,11 +21,11 @@ struct Repository {
 	enum Protocol protocol;
 };
 
-struct Repository	 extract_repository_from_pattern(char *);
-struct Repository	 extract_repository_from_cwd(char *, char *);
+struct Repository	 extract_repository_from_pattern(const char *);
+struct Repository	 extract_repository_from_cwd(const char *, const char *);
 void			 overload_repository_with_pattern(struct Repository *,
-			    char *);
-char			*extract_location_from_repository(char *,
+			    const char *);
+char			*extract_location_from_repository(const char *,
 			    struct Repository);
 char			*extract_url_from_repository(struct Repository);
 void			 free_repository(struct Repository *);

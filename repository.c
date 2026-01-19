@@ -9,7 +9,7 @@
  * Returns pointer to the suffix, or NULL if not present.
  */
 static char *
-find_git_suffix(char *str)
+find_git_suffix(const char *str)
 {
 	size_t len;
 
@@ -18,12 +18,12 @@ find_git_suffix(char *str)
 	len = strlen(str);
 	if (len >= GIT_SUFFIX_LEN &&
 	    strcmp(str + len - GIT_SUFFIX_LEN, GIT_SUFFIX) == 0)
-		return str + len - GIT_SUFFIX_LEN;
+		return (char *)(str + len - GIT_SUFFIX_LEN);
 	return NULL;
 }
 
 char *
-copy_substring(char *start, char *end)
+copy_substring(const char *start, const char *end)
 {
 	char *result;
 
@@ -38,9 +38,9 @@ copy_substring(char *start, char *end)
 
 void
 extract_repository_from_ssh_pattern(struct Repository *repository,
-    char *pattern)
+    const char *pattern)
 {
-	char *at, *colon, *end, *slash;
+	const char *at, *colon, *end, *slash;
 
 	repository->protocol = SSH;
 
@@ -64,10 +64,10 @@ extract_repository_from_ssh_pattern(struct Repository *repository,
 
 void
 extract_repository_from_https_pattern(struct Repository *repository,
-    char *pattern)
+    const char *pattern)
 {
-	char *host_end, *host_start, *name_end, *name_start, *proto, *user_end,
-	     *user_start;
+	const char *host_end, *host_start, *name_end, *name_start, *proto,
+		   *user_end, *user_start;
 
 	repository->protocol = HTTPS;
 
@@ -94,9 +94,10 @@ extract_repository_from_https_pattern(struct Repository *repository,
 }
 
 void
-overload_repository_with_pattern(struct Repository *repository, char *pattern)
+overload_repository_with_pattern(struct Repository *repository,
+    const char *pattern)
 {
-	char *end, *start;
+	const char *end, *start;
 
 	if (repository == NULL || pattern == NULL)
 		return;
@@ -133,7 +134,7 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 }
 
 struct Repository
-extract_repository_from_pattern(char *pattern)
+extract_repository_from_pattern(const char *pattern)
 {
 	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
 
@@ -149,7 +150,7 @@ extract_repository_from_pattern(char *pattern)
 }
 
 struct Repository
-extract_repository_from_cwd(char *clone_path, char *pattern)
+extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
 	struct Repository repository = {NULL, NULL, NULL, SSH};
 	char cwd[PATH_MAX];
@@ -203,7 +204,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 }
 
 char *
-extract_location_from_repository(char *clone_path, struct Repository repository)
+extract_location_from_repository(const char *clone_path,
+    struct Repository repository)
 {
 	char *out;
 	int len;

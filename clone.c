@@ -81,7 +81,7 @@ get_clone_path(void)
 }
 
 int
-valid_git_ssh_pattern(char *pattern)
+valid_git_ssh_pattern(const char *pattern)
 {
 	char *valid_patterns[] = {
 		"git@*:*/*.git",
@@ -98,7 +98,7 @@ valid_git_ssh_pattern(char *pattern)
 }
 
 int
-valid_git_https_pattern(char *pattern)
+valid_git_https_pattern(const char *pattern)
 {
 	char *valid_patterns[] = {
 		"https://*/*/*.git",
@@ -115,7 +115,7 @@ valid_git_https_pattern(char *pattern)
 }
 
 int
-unsupported_git_clone_patterns(char *pattern)
+unsupported_git_clone_patterns(const char *pattern)
 {
 	char *invalid_patterns[] = {
 		"git://*/*",
@@ -134,7 +134,7 @@ unsupported_git_clone_patterns(char *pattern)
 }
 
 int
-is_url_pattern(char *pattern)
+is_url_pattern(const char *pattern)
 {
 	return valid_git_ssh_pattern(pattern) ||
 	    valid_git_https_pattern(pattern) ||
@@ -142,7 +142,7 @@ is_url_pattern(char *pattern)
 }
 
 int
-cwd_is_inside_clone_path(char *clone_path)
+cwd_is_inside_clone_path(const char *clone_path)
 {
 	char cwd[PATH_MAX];
 	size_t len;

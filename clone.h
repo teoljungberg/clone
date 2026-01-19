@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int	valid_git_ssh_pattern(char *);
-int	valid_git_https_pattern(char *);
-int	is_url_pattern(char *);
+int	valid_git_ssh_pattern(const char *);
+int	valid_git_https_pattern(const char *);
+int	is_url_pattern(const char *);
 
 #endif /* _CLONE_H_ */
