@@ -1,6 +1,9 @@
 #include "clone.h"
 #include "repository.h"
 
+#define GIT_SUFFIX	".git"
+#define GIT_SUFFIX_LEN	(sizeof(GIT_SUFFIX) - 1)
+
 /*
  * Find ".git" suffix at end of string.
  * Returns pointer to the suffix, or NULL if not present.
@@ -13,8 +16,9 @@ find_git_suffix(char *str)
 	if (str == NULL)
 		return NULL;
 	len = strlen(str);
-	if (len >= 4 && strcmp(str + len - 4, ".git") == 0)
-		return str + len - 4;
+	if (len >= GIT_SUFFIX_LEN &&
+	    strcmp(str + len - GIT_SUFFIX_LEN, GIT_SUFFIX) == 0)
+		return str + len - GIT_SUFFIX_LEN;
 	return NULL;
 }
 
