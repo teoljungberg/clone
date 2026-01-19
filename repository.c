@@ -59,8 +59,13 @@ extract_repository_from_https_pattern(struct Repository *repository,
 {
 	repository->protocol = HTTPS;
 
-	char *host_start = strstr(pattern, "://") + 3;
+	char *proto = strstr(pattern, "://");
+	if (!proto)
+		return;
+	char *host_start = proto + 3;
 	char *host_end = strchr(host_start, '/');
+	if (!host_end)
+		return;
 	repository->host = copy_substring(host_start, host_end);
 	if (!repository->host) {
 		free_repository(repository);
@@ -69,6 +74,10 @@ extract_repository_from_https_pattern(struct Repository *repository,
 
 	char *user_start = host_end + 1;
 	char *user_end = strchr(user_start, '/');
+	if (!user_end) {
+		free_repository(repository);
+		return;
+	}
 	repository->user = copy_substring(user_start, user_end);
 	if (!repository->user) {
 		free_repository(repository);
@@ -155,7 +164,7 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 {
 	struct Repository repository = {NULL, NULL, NULL, SSH};
 
-	char cwd[1024];
+	char cwd[PATH_MAX];
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return repository;
 
@@ -171,6 +180,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		start = end + 1;
 	} else {
 		repository.host = strdup(start);
+		if (!repository.host)
+			exit(1);
 	}
 
 	// Extract repository user
@@ -180,6 +191,10 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		start = end + 1;
 	} else {
 		repository.user = strdup(start);
+		if (!repository.user) {
+			free_repository(&repository);
+			exit(1);
+		}
 		start = start + strlen(start);
 	}
 
@@ -187,10 +202,15 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	end = strchr(start, '/');
 	if (!end)
 		end = strstr(start, ".git");
-	if (end)
+	if (end) {
 		repository.name = copy_substring(start, end);
-	else
+	} else {
 		repository.name = strdup(start);
+		if (!repository.name) {
+			free_repository(&repository);
+			exit(1);
+		}
+	}
 
 	// Overload repository with pattern with user and repository name as
 	// needed from the pattern
@@ -282,4 +302,8 @@ free_repository(struct Repository *repository)
 	free(repository->host);
 	free(repository->user);
 	free(repository->name);
+	repository->host = NULL;
+	repository->user = NULL;
+	repository->name = NULL;
+	repository->protocol = UNDEFINED;
 }

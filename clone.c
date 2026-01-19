@@ -19,20 +19,22 @@ expand_tilde(const char *path)
 		return strdup(path);
 
 	char *home = getenv("HOME");
-	if (home == NULL)
+	if (home == NULL || home[0] == '\0')
 		return strdup(path);
 
 	size_t home_len = strlen(home);
 	size_t path_len = strlen(path);
-	size_t total_len = home_len +
-	    path_len; // -1 for ~ +1 for null terminator
+
+	// Check for overflow: home_len + path_len - 1 (for ~) + 1 (for NUL)
+	if (home_len > SIZE_MAX - path_len)
+		return NULL;
+	size_t total_len = home_len + path_len;
 
 	char *expanded = malloc(total_len);
 	if (expanded == NULL)
 		return NULL;
 
-	strcpy(expanded, home);
-	strcat(expanded, path + 1); // Skip the ~
+	snprintf(expanded, total_len, "%s%s", home, path + 1);
 
 	return expanded;
 }
@@ -57,8 +59,7 @@ get_clone_path(void)
 			free(expanded);
 			exit(1);
 		}
-		strcpy(with_slash, expanded);
-		strcat(with_slash, "/");
+		snprintf(with_slash, len + 2, "%s/", expanded);
 		free(expanded);
 		expanded = with_slash;
 	}
@@ -135,7 +136,7 @@ valid_git_clone_url(char *pattern)
 int
 cwd_is_inside_clone_path(char *clone_path)
 {
-	char cwd[1024];
+	char cwd[PATH_MAX];
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return 0;
@@ -199,6 +200,15 @@ main(int argc, char *argv[])
 	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
+	if (!location || !url) {
+		fprintf(stderr, "Failed to construct clone command\n");
+		free(clone_path);
+		free(location);
+		free(url);
+		free_repository(&repository);
+		exit(1);
+	}
+
 	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
 	} else {
@@ -206,6 +216,12 @@ main(int argc, char *argv[])
 			location, NULL };
 		execvp(translated_clone_command[0],
 		    (char *const *)translated_clone_command);
+		perror("execvp");
+		free(clone_path);
+		free(location);
+		free(url);
+		free_repository(&repository);
+		exit(1);
 	}
 
 	free(clone_path);
