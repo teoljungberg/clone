@@ -82,8 +82,11 @@ extract_repository_from_https_pattern(struct Repository *repository,
 
 	user_start = host_end + 1;
 	user_end = strchr(user_start, '/');
-	if (user_end == NULL)
+	if (user_end == NULL) {
+		free(repository->host);
+		repository->host = NULL;
 		return;
+	}
 	repository->user = copy_substring(user_start, user_end);
 
 	name_start = user_end + 1;
