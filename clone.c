@@ -46,7 +46,7 @@ char *
 get_clone_path(void)
 {
 	static char *cached_path = NULL;
-	char *expanded, *with_slash;
+	char *expanded;
 	size_t len;
 
 	if (cached_path != NULL)
@@ -56,16 +56,10 @@ get_clone_path(void)
 	if (expanded == NULL)
 		err(1, NULL);
 
-	/* ensure path ends with a slash */
+	/* strip trailing slash if present */
 	len = strlen(expanded);
-	if (len > 0 && expanded[len - 1] != '/') {
-		with_slash = malloc(len + 2);
-		if (with_slash == NULL)
-			err(1, NULL);
-		snprintf(with_slash, len + 2, "%s/", expanded);
-		free(expanded);
-		expanded = with_slash;
-	}
+	if (len > 0 && expanded[len - 1] == '/')
+		expanded[len - 1] = '\0';
 
 	free(cached_path);
 	cached_path = expanded;
@@ -140,13 +134,21 @@ int
 cwd_is_inside_clone_path(char *clone_path)
 {
 	char cwd[PATH_MAX];
+	size_t len;
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return 0;
-	else if (strstr(cwd, clone_path) != NULL)
-		return 1;
-	else
+
+	/* clone_path must match at start of cwd */
+	len = strlen(clone_path);
+	if (strncmp(cwd, clone_path, len) != 0)
 		return 0;
+
+	/* must be followed by '/' or end of string */
+	if (cwd[len] != '/' && cwd[len] != '\0')
+		return 0;
+
+	return 1;
 }
 
 int

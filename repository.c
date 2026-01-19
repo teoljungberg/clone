@@ -134,6 +134,8 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		return repository;
 
 	start += strlen(clone_path);
+	if (*start == '/')
+		start++;
 	char *end = strchr(start, '/');
 	if (end) {
 		repository.host = copy_substring(start, end);
