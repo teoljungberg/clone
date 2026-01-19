@@ -8,10 +8,8 @@ copy_substring(char *start, char *end)
 		return NULL;
 
 	char *result = strndup(start, end - start);
-	if (!result) {
-		fprintf(stderr, "Failed to allocate memory for substring\n");
-		exit(1);
-	}
+	if (result == NULL)
+		err(1, NULL);
 	return result;
 }
 
@@ -25,31 +23,17 @@ extract_repository_from_ssh_pattern(struct Repository *repository,
 	char *colon = strchr(pattern, ':');
 	char *slash = strchr(pattern, '/');
 
-	if (at && colon && at < colon) {
+	if (at && colon && at < colon)
 		repository->host = copy_substring(at + 1, colon);
-		if (!repository->host) {
-			free_repository(repository);
-			exit(1);
-		}
-	}
 
-	if (colon && slash && colon < slash) {
+	if (colon && slash && colon < slash)
 		repository->user = copy_substring(colon + 1, slash);
-		if (!repository->user) {
-			free_repository(repository);
-			exit(1);
-		}
-	}
 
 	if (slash) {
 		char *end = strstr(slash, ".git");
 		if (!end)
 			end = pattern + strlen(pattern);
 		repository->name = copy_substring(slash + 1, end);
-		if (!repository->name) {
-			free_repository(repository);
-			exit(1);
-		}
 	}
 }
 
@@ -67,32 +51,18 @@ extract_repository_from_https_pattern(struct Repository *repository,
 	if (!host_end)
 		return;
 	repository->host = copy_substring(host_start, host_end);
-	if (!repository->host) {
-		free_repository(repository);
-		exit(1);
-	}
 
 	char *user_start = host_end + 1;
 	char *user_end = strchr(user_start, '/');
-	if (!user_end) {
-		free_repository(repository);
+	if (!user_end)
 		return;
-	}
 	repository->user = copy_substring(user_start, user_end);
-	if (!repository->user) {
-		free_repository(repository);
-		exit(1);
-	}
 
 	char *name_start = user_end + 1;
 	char *name_end = strstr(name_start, ".git");
 	if (!name_end)
 		name_end = pattern + strlen(pattern);
 	repository->name = copy_substring(name_start, name_end);
-	if (!repository->name) {
-		free_repository(repository);
-		exit(1);
-	}
 }
 
 void
@@ -104,16 +74,12 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 	char *end, *start;
 
 	if (fnmatch("*/*", pattern, 0) == 0) {
-		// Pattern has both user and repository name
+		/* pattern has both user and repository name */
 		start = pattern;
 		end = strchr(pattern, '/');
 		if (end) {
 			free(repository->user);
 			repository->user = copy_substring(start, end);
-			if (!repository->user) {
-				free_repository(repository);
-				exit(1);
-			}
 
 			start = end + 1;
 			end = strstr(start, ".git");
@@ -123,23 +89,18 @@ overload_repository_with_pattern(struct Repository *repository, char *pattern)
 				repository->name = copy_substring(start, end);
 			else
 				repository->name = strdup(start);
-			if (!repository->name) {
-				free_repository(repository);
-				exit(1);
-			}
+			if (repository->name == NULL)
+				err(1, NULL);
 		}
 	} else {
-		// Pattern has only repository name
 		free(repository->name);
 		end = strstr(pattern, ".git");
 		if (end)
 			repository->name = copy_substring(pattern, end);
 		else
 			repository->name = strdup(pattern);
-		if (!repository->name) {
-			free_repository(repository);
-			exit(1);
-		}
+		if (repository->name == NULL)
+			err(1, NULL);
 	}
 }
 
@@ -172,7 +133,6 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	if (!start)
 		return repository;
 
-	// Extract repository host
 	start += strlen(clone_path);
 	char *end = strchr(start, '/');
 	if (end) {
@@ -180,25 +140,21 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		start = end + 1;
 	} else {
 		repository.host = strdup(start);
-		if (!repository.host)
-			exit(1);
+		if (repository.host == NULL)
+			err(1, NULL);
 	}
 
-	// Extract repository user
 	end = strchr(start, '/');
 	if (end) {
 		repository.user = copy_substring(start, end);
 		start = end + 1;
 	} else {
 		repository.user = strdup(start);
-		if (!repository.user) {
-			free_repository(&repository);
-			exit(1);
-		}
+		if (repository.user == NULL)
+			err(1, NULL);
 		start = start + strlen(start);
 	}
 
-	// Extract repository name
 	end = strchr(start, '/');
 	if (!end)
 		end = strstr(start, ".git");
@@ -206,14 +162,10 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 		repository.name = copy_substring(start, end);
 	} else {
 		repository.name = strdup(start);
-		if (!repository.name) {
-			free_repository(&repository);
-			exit(1);
-		}
+		if (repository.name == NULL)
+			err(1, NULL);
 	}
 
-	// Overload repository with pattern with user and repository name as
-	// needed from the pattern
 	overload_repository_with_pattern(&repository, pattern);
 
 	return repository;

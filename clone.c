@@ -15,22 +15,25 @@ usage(void)
 char *
 expand_tilde(const char *path)
 {
+	char *home, *expanded;
+	size_t home_len, path_len, total_len;
+
 	if (path[0] != '~')
 		return strdup(path);
 
-	char *home = getenv("HOME");
+	home = getenv("HOME");
 	if (home == NULL || home[0] == '\0')
 		return strdup(path);
 
-	size_t home_len = strlen(home);
-	size_t path_len = strlen(path);
+	home_len = strlen(home);
+	path_len = strlen(path);
 
-	// Check for overflow: home_len + path_len - 1 (for ~) + 1 (for NUL)
+	/* check for overflow */
 	if (home_len > SIZE_MAX - path_len)
 		return NULL;
-	size_t total_len = home_len + path_len;
+	total_len = home_len + path_len;
 
-	char *expanded = malloc(total_len);
+	expanded = malloc(total_len);
 	if (expanded == NULL)
 		return NULL;
 
@@ -43,22 +46,22 @@ char *
 get_clone_path(void)
 {
 	static char *cached_path = NULL;
+	char *expanded, *with_slash;
+	size_t len;
 
 	if (cached_path != NULL)
 		return strdup(cached_path);
 
-	char *expanded = expand_tilde(CLONE_PATH);
+	expanded = expand_tilde(CLONE_PATH);
 	if (expanded == NULL)
-		exit(1);
+		err(1, NULL);
 
-	// Ensure it ends with a slash
-	size_t len = strlen(expanded);
+	/* ensure path ends with a slash */
+	len = strlen(expanded);
 	if (len > 0 && expanded[len - 1] != '/') {
-		char *with_slash = malloc(len + 2);
-		if (with_slash == NULL) {
-			free(expanded);
-			exit(1);
-		}
+		with_slash = malloc(len + 2);
+		if (with_slash == NULL)
+			err(1, NULL);
 		snprintf(with_slash, len + 2, "%s/", expanded);
 		free(expanded);
 		expanded = with_slash;
@@ -159,6 +162,8 @@ invalid_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
+	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
+	char *clone_path, *location, *pattern, *url;
 	int nflag = 0;
 	int ch;
 
@@ -174,9 +179,7 @@ main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	char *clone_path = get_clone_path();
-	char *location, *pattern, *url;
-	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
+	clone_path = get_clone_path();
 
 	if (argc != 1)
 		usage();
@@ -188,26 +191,14 @@ main(int argc, char *argv[])
 	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
 
-	if (invalid_repository(repository)) {
-		fprintf(stderr,
-		    "Could not extract repository from pattern or cwd: %s\n",
-		    pattern);
-		free(clone_path);
-		free_repository(&repository);
-		exit(1);
-	}
+	if (invalid_repository(repository))
+		errx(1, "could not extract repository: %s", pattern);
 
 	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
-	if (!location || !url) {
-		fprintf(stderr, "Failed to construct clone command\n");
-		free(clone_path);
-		free(location);
-		free(url);
-		free_repository(&repository);
-		exit(1);
-	}
+	if (!location || !url)
+		err(1, NULL);
 
 	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
@@ -216,12 +207,7 @@ main(int argc, char *argv[])
 			location, NULL };
 		execvp(translated_clone_command[0],
 		    (char *const *)translated_clone_command);
-		perror("execvp");
-		free(clone_path);
-		free(location);
-		free(url);
-		free_repository(&repository);
-		exit(1);
+		err(1, "git");
 	}
 
 	free(clone_path);

@@ -1,3 +1,7 @@
+#ifndef _CLONE_H_
+#define _CLONE_H_
+
+#include <err.h>
 #include <fnmatch.h>
 #include <getopt.h>
 #include <limits.h>
@@ -5,11 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef CLONE_H
-#define CLONE_H 1
+int	valid_git_ssh_pattern(char *);
+int	valid_git_https_pattern(char *);
+int	valid_git_clone_url(char *);
 
-int valid_git_ssh_pattern(char *pattern);
-int valid_git_https_pattern(char *pattern);
-int valid_git_clone_url(char *pattern);
-
-#endif
+#endif /* _CLONE_H_ */
