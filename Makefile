@@ -39,7 +39,7 @@ install: ${PROG}
 lint:
 	mandoc -Tlint -Wstyle ${PROG}.1
 	knfmt -ds ${SRCS}
-.PHONE :lint
+.PHONY: lint
 
 fmt:
 	knfmt -is ${SRCS}
