@@ -183,7 +183,8 @@ invalid_repository(struct Repository repository)
 	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
 	    repository.name[0] == '\0')
 		return 1;
-	if (contains_path_traversal(repository.user) ||
+	if (contains_path_traversal(repository.host) ||
+	    contains_path_traversal(repository.user) ||
 	    contains_path_traversal(repository.name))
 		return 1;
 	return 0;
