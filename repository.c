@@ -8,7 +8,7 @@
  * Find ".git" suffix at end of string.
  * Returns pointer to the suffix, or NULL if not present.
  */
-static char *
+static const char *
 find_git_suffix(const char *str)
 {
 	size_t len;
@@ -18,7 +18,7 @@ find_git_suffix(const char *str)
 	len = strlen(str);
 	if (len >= GIT_SUFFIX_LEN &&
 	    strcmp(str + len - GIT_SUFFIX_LEN, GIT_SUFFIX) == 0)
-		return (char *)(str + len - GIT_SUFFIX_LEN);
+		return str + len - GIT_SUFFIX_LEN;
 	return NULL;
 }
 
@@ -155,6 +155,7 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	struct Repository repository = {NULL, NULL, NULL, SSH};
 	char cwd[PATH_MAX];
 	char *end, *start;
+	const char *suffix;
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return repository;
@@ -188,14 +189,17 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	}
 
 	end = strchr(start, '/');
-	if (end == NULL)
-		end = find_git_suffix(start);
 	if (end != NULL) {
 		repository.name = copy_substring(start, end);
 	} else {
-		repository.name = strdup(start);
-		if (repository.name == NULL)
-			err(1, NULL);
+		suffix = find_git_suffix(start);
+		if (suffix != NULL) {
+			repository.name = copy_substring(start, suffix);
+		} else {
+			repository.name = strdup(start);
+			if (repository.name == NULL)
+				err(1, NULL);
+		}
 	}
 
 	overload_repository_with_pattern(&repository, pattern);
