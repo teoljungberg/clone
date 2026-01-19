@@ -21,10 +21,12 @@ find_git_suffix(char *str)
 char *
 copy_substring(char *start, char *end)
 {
-	if (!start || !end || end <= start)
+	char *result;
+
+	if (start == NULL || end == NULL || end <= start)
 		return NULL;
 
-	char *result = strndup(start, end - start);
+	result = strndup(start, end - start);
 	if (result == NULL)
 		err(1, NULL);
 	return result;
@@ -48,7 +50,7 @@ extract_repository_from_ssh_pattern(struct Repository *repository,
 
 	if (slash) {
 		char *end = find_git_suffix(slash);
-		if (!end)
+		if (end == NULL)
 			end = pattern + strlen(pattern);
 		repository->name = copy_substring(slash + 1, end);
 	}
@@ -58,26 +60,29 @@ void
 extract_repository_from_https_pattern(struct Repository *repository,
     char *pattern)
 {
+	char *host_end, *host_start, *name_end, *name_start, *proto, *user_end,
+	     *user_start;
+
 	repository->protocol = HTTPS;
 
-	char *proto = strstr(pattern, "://");
-	if (!proto)
+	proto = strstr(pattern, "://");
+	if (proto == NULL)
 		return;
-	char *host_start = proto + 3;
-	char *host_end = strchr(host_start, '/');
-	if (!host_end)
+	host_start = proto + 3;
+	host_end = strchr(host_start, '/');
+	if (host_end == NULL)
 		return;
 	repository->host = copy_substring(host_start, host_end);
 
-	char *user_start = host_end + 1;
-	char *user_end = strchr(user_start, '/');
-	if (!user_end)
+	user_start = host_end + 1;
+	user_end = strchr(user_start, '/');
+	if (user_end == NULL)
 		return;
 	repository->user = copy_substring(user_start, user_end);
 
-	char *name_start = user_end + 1;
-	char *name_end = find_git_suffix(name_start);
-	if (!name_end)
+	name_start = user_end + 1;
+	name_end = find_git_suffix(name_start);
+	if (name_end == NULL)
 		name_end = pattern + strlen(pattern);
 	repository->name = copy_substring(name_start, name_end);
 }
@@ -85,10 +90,10 @@ extract_repository_from_https_pattern(struct Repository *repository,
 void
 overload_repository_with_pattern(struct Repository *repository, char *pattern)
 {
-	if (!repository || !pattern)
-		return;
-
 	char *end, *start;
+
+	if (repository == NULL || pattern == NULL)
+		return;
 
 	if (fnmatch("*/*", pattern, 0) == 0) {
 		/* pattern has both user and repository name */
@@ -126,7 +131,7 @@ extract_repository_from_pattern(char *pattern)
 {
 	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
 
-	if (!pattern)
+	if (pattern == NULL)
 		return repository;
 
 	if (valid_git_ssh_pattern(pattern))
@@ -141,19 +146,20 @@ struct Repository
 extract_repository_from_cwd(char *clone_path, char *pattern)
 {
 	struct Repository repository = {NULL, NULL, NULL, SSH};
-
 	char cwd[PATH_MAX];
+	char *end, *start;
+
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return repository;
 
-	char *start = strstr(cwd, clone_path);
-	if (!start)
+	start = strstr(cwd, clone_path);
+	if (start == NULL)
 		return repository;
 
 	start += strlen(clone_path);
 	if (*start == '/')
 		start++;
-	char *end = strchr(start, '/');
+	end = strchr(start, '/');
 	if (end) {
 		repository.host = copy_substring(start, end);
 		start = end + 1;
@@ -175,9 +181,9 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 	}
 
 	end = strchr(start, '/');
-	if (!end)
+	if (end == NULL)
 		end = find_git_suffix(start);
-	if (end) {
+	if (end != NULL) {
 		repository.name = copy_substring(start, end);
 	} else {
 		repository.name = strdup(start);
@@ -193,21 +199,20 @@ extract_repository_from_cwd(char *clone_path, char *pattern)
 char *
 extract_location_from_repository(char *clone_path, struct Repository repository)
 {
-	char format[12] = "%s/%s/%s/%s";
+	char *out;
 	int required_size;
 
-	required_size = snprintf(NULL, 0, format, clone_path, repository.host,
-	    repository.user, repository.name);
-
+	required_size = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path,
+	    repository.host, repository.user, repository.name);
 	if (required_size < 0)
 		return NULL;
 
-	char *out = malloc(required_size + 1);
-	if (!out)
+	out = malloc(required_size + 1);
+	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, format, clone_path, repository.host,
-	    repository.user, repository.name);
+	snprintf(out, required_size + 1, "%s/%s/%s/%s", clone_path,
+	    repository.host, repository.user, repository.name);
 
 	return out;
 }
@@ -215,20 +220,19 @@ extract_location_from_repository(char *clone_path, struct Repository repository)
 char *
 extract_ssh_url_from_repository(struct Repository repository)
 {
-	char format[13] = "git@%s:%s/%s";
+	char *out;
 	int required_size;
 
-	required_size = snprintf(NULL, 0, format, repository.host,
+	required_size = snprintf(NULL, 0, "git@%s:%s/%s", repository.host,
 	    repository.user, repository.name);
-
 	if (required_size < 0)
 		return NULL;
 
-	char *out = malloc(required_size + 1);
-	if (!out)
+	out = malloc(required_size + 1);
+	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, format, repository.host,
+	snprintf(out, required_size + 1, "git@%s:%s/%s", repository.host,
 	    repository.user, repository.name);
 
 	return out;
@@ -237,20 +241,19 @@ extract_ssh_url_from_repository(struct Repository repository)
 char *
 extract_https_url_from_repository(struct Repository repository)
 {
-	char format[17] = "https://%s/%s/%s";
+	char *out;
 	int required_size;
 
-	required_size = snprintf(NULL, 0, format, repository.host,
+	required_size = snprintf(NULL, 0, "https://%s/%s/%s", repository.host,
 	    repository.user, repository.name);
-
 	if (required_size < 0)
 		return NULL;
 
-	char *out = malloc(required_size + 1);
-	if (!out)
+	out = malloc(required_size + 1);
+	if (out == NULL)
 		return NULL;
 
-	snprintf(out, required_size + 1, format, repository.host,
+	snprintf(out, required_size + 1, "https://%s/%s/%s", repository.host,
 	    repository.user, repository.name);
 
 	return out;

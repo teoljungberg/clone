@@ -201,7 +201,7 @@ main(int argc, char *argv[])
 	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
-	if (!location || !url)
+	if (location == NULL || url == NULL)
 		err(1, NULL);
 
 	if (nflag) {
