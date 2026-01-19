@@ -47,5 +47,5 @@ fmt:
 .PHONY: fmt
 
 test: ${PROG}
-	$(MAKE) -C tests
+	${MAKE} -C ${.CURDIR}/tests
 .PHONY: test
