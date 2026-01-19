@@ -15,15 +15,23 @@ usage(void)
 char *
 expand_tilde(const char *path)
 {
-	char *home, *expanded;
+	char *expanded, *home, *result;
 	size_t home_len, path_len, total_len;
 
-	if (path[0] != '~')
-		return strdup(path);
+	if (path[0] != '~') {
+		result = strdup(path);
+		if (result == NULL)
+			err(1, NULL);
+		return result;
+	}
 
 	home = getenv("HOME");
-	if (home == NULL || home[0] == '\0')
-		return strdup(path);
+	if (home == NULL || home[0] == '\0') {
+		result = strdup(path);
+		if (result == NULL)
+			err(1, NULL);
+		return result;
+	}
 
 	home_len = strlen(home);
 	path_len = strlen(path);
@@ -61,7 +69,6 @@ get_clone_path(void)
 	if (len > 0 && expanded[len - 1] == '/')
 		expanded[len - 1] = '\0';
 
-	free(cached_path);
 	cached_path = expanded;
 	return strdup(cached_path);
 }
@@ -206,18 +213,15 @@ main(int argc, char *argv[])
 
 	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
-	} else {
-		const char *translated_clone_command[] = { "git", "clone", url,
-			location, NULL };
-		execvp(translated_clone_command[0],
-		    (char *const *)translated_clone_command);
-		err(1, "git");
+		free(clone_path);
+		free(location);
+		free(url);
+		free_repository(&repository);
+		return 0;
 	}
 
-	free(clone_path);
-	free(location);
-	free(url);
-	free_repository(&repository);
+	char *const cmd[] = { "git", "clone", url, location, NULL };
 
-	return 0;
+	execvp(cmd[0], cmd);
+	err(1, "git");
 }

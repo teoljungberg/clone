@@ -36,20 +36,22 @@ void
 extract_repository_from_ssh_pattern(struct Repository *repository,
     char *pattern)
 {
+	char *at, *colon, *end, *slash;
+
 	repository->protocol = SSH;
 
-	char *at = strchr(pattern, '@');
-	char *colon = strchr(pattern, ':');
-	char *slash = strchr(pattern, '/');
+	at = strchr(pattern, '@');
+	colon = strchr(pattern, ':');
+	slash = strchr(pattern, '/');
 
-	if (at && colon && at < colon)
+	if (at != NULL && colon != NULL && at < colon)
 		repository->host = copy_substring(at + 1, colon);
 
-	if (colon && slash && colon < slash)
+	if (colon != NULL && slash != NULL && colon < slash)
 		repository->user = copy_substring(colon + 1, slash);
 
-	if (slash) {
-		char *end = find_git_suffix(slash);
+	if (slash != NULL) {
+		end = find_git_suffix(slash);
 		if (end == NULL)
 			end = pattern + strlen(pattern);
 		repository->name = copy_substring(slash + 1, end);
