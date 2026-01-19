@@ -217,7 +217,7 @@ extract_location_from_repository(const char *clone_path,
 
 	len = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path,
 	    repository.host, repository.user, repository.name);
-	if (len < 0 || (size_t)len >= SIZE_MAX)
+	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
 	size = (size_t)len + 1;
@@ -240,7 +240,7 @@ extract_ssh_url_from_repository(struct Repository repository)
 
 	len = snprintf(NULL, 0, "git@%s:%s/%s", repository.host,
 	    repository.user, repository.name);
-	if (len < 0 || (size_t)len >= SIZE_MAX)
+	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
 	size = (size_t)len + 1;
@@ -263,7 +263,7 @@ extract_https_url_from_repository(struct Repository repository)
 
 	len = snprintf(NULL, 0, "https://%s/%s/%s", repository.host,
 	    repository.user, repository.name);
-	if (len < 0 || (size_t)len >= SIZE_MAX)
+	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
 	size = (size_t)len + 1;
