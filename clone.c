@@ -83,7 +83,7 @@ get_clone_path(void)
 int
 valid_git_ssh_pattern(const char *pattern)
 {
-	char *valid_patterns[] = {
+	const char *valid_patterns[] = {
 		"git@*:*/*.git",
 		"git@*:*/*",
 	};
@@ -100,7 +100,7 @@ valid_git_ssh_pattern(const char *pattern)
 int
 valid_git_https_pattern(const char *pattern)
 {
-	char *valid_patterns[] = {
+	const char *valid_patterns[] = {
 		"https://*/*/*.git",
 		"https://*/*/*",
 	};
@@ -117,7 +117,7 @@ valid_git_https_pattern(const char *pattern)
 int
 unsupported_git_clone_patterns(const char *pattern)
 {
-	char *invalid_patterns[] = {
+	const char *invalid_patterns[] = {
 		"git://*/*",
 		"git://*/*.git",
 		"ssh://git@*/*",
