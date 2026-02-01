@@ -5,6 +5,10 @@
 #define __dead __attribute__((__noreturn__))
 #endif
 
+#ifndef __OpenBSD__
+#define pledge(promises, execpromises) (0)
+#endif
+
 extern char *__progname;
 
 static void __dead
@@ -204,6 +208,9 @@ main(int argc, char *argv[])
 	char *clone_path, *location, *pattern, *url;
 	int nflag = 0;
 	int ch;
+
+	if (pledge("stdio rpath exec", NULL) == -1)
+		err(1, "pledge");
 
 	while ((ch = getopt(argc, argv, "n")) != -1) {
 		switch (ch) {
