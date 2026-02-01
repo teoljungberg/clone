@@ -1,11 +1,17 @@
 #include "clone.h"
 #include "repository.h"
 
-static void
+#ifndef __dead
+#define __dead __attribute__((__noreturn__))
+#endif
+
+extern char *__progname;
+
+static void __dead
 usage(void)
 {
-	fprintf(stderr, "usage: clone [-n] pattern\n");
-	exit(2);
+	fprintf(stderr, "usage: %s [-n] pattern\n", __progname);
+	exit(1);
 }
 
 #ifndef CLONE_PATH
