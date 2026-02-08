@@ -1,6 +1,8 @@
 #ifndef _CLONE_H_
 #define _CLONE_H_
 
+#include <sys/param.h>
+
 #include <err.h>
 #include <fnmatch.h>
 #include <limits.h>
