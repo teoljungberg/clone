@@ -62,7 +62,7 @@ jobs:
         CC=${{ matrix.compiler }} make test
 
   openbsd:
-    name: openbsd + clang
+    name: openbsd
     runs-on: ubuntu-latest
 
     steps:
