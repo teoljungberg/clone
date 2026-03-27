@@ -24,6 +24,10 @@ https://host/user/repository
 .It
 https://host/user/repository.git
 .It
+ssh://user@host/repository
+.It
+ssh://user@host/repository.git
+.It
 user/repository
 .It
 repository
@@ -58,6 +62,10 @@ To clone a repository from GitHub over ssh:
 To clone a repository from GitHub over https:
 .Pp
 .Dl % clone https://github.com/user/repository
+.Pp
+To clone a repository from a host that uses ssh:// URLs:
+.Pp
+.Dl % clone ssh://anonymous@got.gameoftrees.org/got
 .Pp
 To clone a repository from a custom git host:
 .Pp

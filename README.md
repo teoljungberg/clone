@@ -16,6 +16,13 @@ git clone git@github.com:/user/repository /home/user/src/github.com/user/reposit
 or
 
 ```
+% clone -n ssh://anonymous@got.gameoftrees.org/got
+git clone ssh://anonymous@got.gameoftrees.org/got /home/user/src/got.gameoftrees.org/anonymous/got
+```
+
+or
+
+```
 % cd /home/user/src/github.com/user
 % clone -n another-repository
 git clone git@github.com:/user/another-repository /home/user/src/github.com/user/another-repository
