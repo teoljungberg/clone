@@ -97,6 +97,41 @@ extract_repository_from_https_pattern(struct Repository *repository,
 }
 
 void
+extract_repository_from_ssh_url_pattern(struct Repository *repository,
+    const char *pattern)
+{
+	const char *at, *host_end, *host_start, *name_end, *name_start, *proto;
+
+	repository->protocol = SSH_URL;
+
+	proto = strstr(pattern, "://");
+	if (proto == NULL)
+		return;
+
+	at = strchr(proto + 3, '@');
+	if (at == NULL)
+		return;
+	/* user is the login name from the URL; it doubles as the directory
+	 * component between host and name in $CLONE_PATH/host/user/name. */
+	repository->user = copy_substring(proto + 3, at);
+
+	host_start = at + 1;
+	host_end = strchr(host_start, '/');
+	if (host_end == NULL) {
+		free(repository->user);
+		repository->user = NULL;
+		return;
+	}
+	repository->host = copy_substring(host_start, host_end);
+
+	name_start = host_end + 1;
+	name_end = find_git_suffix(name_start);
+	if (name_end == NULL)
+		name_end = pattern + strlen(pattern);
+	repository->name = copy_substring(name_start, name_end);
+}
+
+void
 overload_repository_with_pattern(struct Repository *repository,
     const char *pattern)
 {
@@ -148,6 +183,8 @@ extract_repository_from_pattern(const char *pattern)
 		extract_repository_from_ssh_pattern(&repository, pattern);
 	else if (valid_git_https_pattern(pattern))
 		extract_repository_from_https_pattern(&repository, pattern);
+	else if (valid_git_ssh_url_pattern(pattern))
+		extract_repository_from_ssh_url_pattern(&repository, pattern);
 
 	return repository;
 }
@@ -281,12 +318,37 @@ extract_https_url_from_repository(struct Repository repository)
 }
 
 char *
+extract_ssh_url_string_from_repository(struct Repository repository)
+{
+	char *out;
+	int len;
+	size_t size;
+
+	len = snprintf(NULL, 0, "ssh://%s@%s/%s", repository.user,
+	    repository.host, repository.name);
+	if (len < 0 || (size_t)len > SIZE_MAX - 1)
+		return NULL;
+
+	size = (size_t)len + 1;
+	out = malloc(size);
+	if (out == NULL)
+		return NULL;
+
+	snprintf(out, size, "ssh://%s@%s/%s", repository.user,
+	    repository.host, repository.name);
+
+	return out;
+}
+
+char *
 extract_url_from_repository(struct Repository repository)
 {
 	if (repository.protocol == SSH)
 		return extract_ssh_url_from_repository(repository);
 	else if (repository.protocol == HTTPS)
 		return extract_https_url_from_repository(repository);
+	else if (repository.protocol == SSH_URL)
+		return extract_ssh_url_string_from_repository(repository);
 	else
 		return NULL;
 }

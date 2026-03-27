@@ -125,13 +125,28 @@ valid_git_https_pattern(const char *pattern)
 }
 
 int
+valid_git_ssh_url_pattern(const char *pattern)
+{
+	const char *valid_patterns[] = {
+		"ssh://*@*/*.git",
+		"ssh://*@*/*",
+	};
+
+	for (size_t i = 0; i < sizeof(valid_patterns) /
+	    sizeof(valid_patterns[0]); i++) {
+		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
+			return 1;
+	}
+
+	return 0;
+}
+
+int
 unsupported_git_clone_patterns(const char *pattern)
 {
 	const char *invalid_patterns[] = {
 		"git://*/*",
 		"git://*/*.git",
-		"ssh://git@*/*",
-		"ssh://git@*/*.git",
 	};
 
 	for (size_t i = 0; i < sizeof(invalid_patterns) /
@@ -148,6 +163,7 @@ is_url_pattern(const char *pattern)
 {
 	return valid_git_ssh_pattern(pattern) ||
 	    valid_git_https_pattern(pattern) ||
+	    valid_git_ssh_url_pattern(pattern) ||
 	    unsupported_git_clone_patterns(pattern);
 }
 

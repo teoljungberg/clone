@@ -12,6 +12,7 @@ enum Protocol {
 	UNDEFINED,
 	SSH,
 	HTTPS,
+	SSH_URL,
 };
 
 struct Repository {
