@@ -9,18 +9,17 @@ on:
       - "**"
 
 jobs:
-  test:
-    name: ${{ matrix.os }} + ${{ matrix.compiler }}
-    runs-on: ${{ matrix.os }}
+  linux:
+    name: linux + ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
         compiler: [gcc, clang]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: make
       run: |
@@ -35,3 +34,51 @@ jobs:
         cd $HOME/src/github.com/user/clone
 
         CC=${{ matrix.compiler }} make test
+
+  macos:
+    name: macos + ${{ matrix.compiler }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: make
+      run: |
+        mkdir -p $HOME/src/github.com/user/clone
+        cp -R * $HOME/src/github.com/user/clone
+        cd $HOME/src/github.com/user/clone
+
+        CC=${{ matrix.compiler }} make
+
+    - name: make test
+      run: |
+        cd $HOME/src/github.com/user/clone
+
+        CC=${{ matrix.compiler }} make test
+
+  openbsd:
+    name: openbsd
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build and test on OpenBSD
+      uses: vmactions/openbsd-vm@v1
+      with:
+        usesh: true
+        prepare: |
+          pkg_add git
+        run: |
+          mkdir -p $HOME/src/github.com/user/clone
+          cp -R * $HOME/src/github.com/user/clone
+          cd $HOME/src/github.com/user/clone
+
+          make
+          make test

@@ -1,14 +1,6 @@
 #include "clone.h"
 #include "repository.h"
 
-#ifndef __dead
-#define __dead __attribute__((__noreturn__))
-#endif
-
-#ifndef __OpenBSD__
-#define pledge(promises, execpromises) (0)
-#endif
-
 extern char *__progname;
 
 static void __dead
@@ -98,8 +90,7 @@ valid_git_ssh_pattern(const char *pattern)
 		"git@*:*/*",
 	};
 
-	for (size_t i = 0; i < sizeof(valid_patterns) /
-	    sizeof(valid_patterns[0]); i++) {
+	for (size_t i = 0; i < nitems(valid_patterns); i++) {
 		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
 			return 1;
 	}
@@ -115,8 +106,7 @@ valid_git_https_pattern(const char *pattern)
 		"https://*/*/*",
 	};
 
-	for (size_t i = 0; i < sizeof(valid_patterns) /
-	    sizeof(valid_patterns[0]); i++) {
+	for (size_t i = 0; i < nitems(valid_patterns); i++) {
 		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
 			return 1;
 	}
@@ -134,8 +124,7 @@ unsupported_git_clone_patterns(const char *pattern)
 		"ssh://git@*/*.git",
 	};
 
-	for (size_t i = 0; i < sizeof(invalid_patterns) /
-	    sizeof(invalid_patterns[0]); i++) {
+	for (size_t i = 0; i < nitems(invalid_patterns); i++) {
 		if (fnmatch(invalid_patterns[i], pattern, 0) == 0)
 			return 1;
 	}
