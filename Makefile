@@ -8,8 +8,8 @@ SRCS+=	repository.c
 
 OBJS=		${SRCS:.c=.o}
 
-PREFIX=		/usr/local
-MANPREFIX=	${PREFIX}/share/man
+PREFIX?=	/usr/local
+MANPREFIX?=	${PREFIX}/share/man
 
 INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
