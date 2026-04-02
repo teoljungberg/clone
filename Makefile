@@ -5,6 +5,7 @@ PROG=	clone
 
 SRCS=	clone.c
 SRCS+=	repository.c
+SRCS+=	url.c
 
 OBJS=		${SRCS:.c=.o}
 

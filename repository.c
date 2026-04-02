@@ -36,64 +36,47 @@ copy_substring(const char *start, const char *end)
 	return result;
 }
 
-void
-extract_repository_from_ssh_pattern(struct Repository *repository,
-    const char *pattern)
+struct Repository
+extract_repository_from_url(const struct url *url)
 {
-	const char *at, *colon, *end, *slash;
+	struct Repository repository = {NULL, NULL, NULL, SCHEME_UNDEFINED};
+	const char *name_start, *slash, *suffix;
 
-	repository->protocol = SSH;
+	if (url == NULL)
+		return repository;
 
-	at = strchr(pattern, '@');
-	colon = strchr(pattern, ':');
-	slash = strchr(pattern, '/');
+	if (url->scheme != SCHEME_SCP && url->scheme != SCHEME_HTTPS)
+		return repository;
 
-	if (at != NULL && colon != NULL && at < colon)
-		repository->host = copy_substring(at + 1, colon);
+	repository.scheme = url->scheme;
 
-	if (colon != NULL && slash != NULL && colon < slash)
-		repository->user = copy_substring(colon + 1, slash);
-
-	if (slash != NULL) {
-		end = find_git_suffix(slash);
-		if (end == NULL)
-			end = pattern + strlen(pattern);
-		repository->name = copy_substring(slash + 1, end);
+	if (url->host != NULL) {
+		repository.host = strdup(url->host);
+		if (repository.host == NULL)
+			err(1, NULL);
 	}
-}
 
-void
-extract_repository_from_https_pattern(struct Repository *repository,
-    const char *pattern)
-{
-	const char *host_end, *host_start, *name_end, *name_start, *proto,
-		   *user_end, *user_start;
+	if (url->path == NULL)
+		return repository;
 
-	repository->protocol = HTTPS;
+	slash = strchr(url->path, '/');
+	if (slash == NULL)
+		return repository;
 
-	proto = strstr(pattern, "://");
-	if (proto == NULL)
-		return;
-	host_start = proto + 3;
-	host_end = strchr(host_start, '/');
-	if (host_end == NULL)
-		return;
-	repository->host = copy_substring(host_start, host_end);
+	repository.user = strndup(url->path, slash - url->path);
+	if (repository.user == NULL)
+		err(1, NULL);
 
-	user_start = host_end + 1;
-	user_end = strchr(user_start, '/');
-	if (user_end == NULL) {
-		free(repository->host);
-		repository->host = NULL;
-		return;
-	}
-	repository->user = copy_substring(user_start, user_end);
+	name_start = slash + 1;
+	suffix = find_git_suffix(name_start);
+	if (suffix != NULL)
+		repository.name = strndup(name_start, suffix - name_start);
+	else
+		repository.name = strdup(name_start);
+	if (repository.name == NULL)
+		err(1, NULL);
 
-	name_start = user_end + 1;
-	name_end = find_git_suffix(name_start);
-	if (name_end == NULL)
-		name_end = pattern + strlen(pattern);
-	repository->name = copy_substring(name_start, name_end);
+	return repository;
 }
 
 void
@@ -137,25 +120,9 @@ overload_repository_with_pattern(struct Repository *repository,
 }
 
 struct Repository
-extract_repository_from_pattern(const char *pattern)
-{
-	struct Repository repository = {NULL, NULL, NULL, UNDEFINED};
-
-	if (pattern == NULL)
-		return repository;
-
-	if (valid_git_ssh_pattern(pattern))
-		extract_repository_from_ssh_pattern(&repository, pattern);
-	else if (valid_git_https_pattern(pattern))
-		extract_repository_from_https_pattern(&repository, pattern);
-
-	return repository;
-}
-
-struct Repository
 extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL, SSH};
+	struct Repository repository = {NULL, NULL, NULL, SCHEME_SCP};
 	char cwd[PATH_MAX];
 	char *end, *start;
 	const char *suffix;
@@ -283,9 +250,9 @@ extract_https_url_from_repository(struct Repository repository)
 char *
 extract_url_from_repository(struct Repository repository)
 {
-	if (repository.protocol == SSH)
+	if (repository.scheme == SCHEME_SCP)
 		return extract_ssh_url_from_repository(repository);
-	else if (repository.protocol == HTTPS)
+	else if (repository.scheme == SCHEME_HTTPS)
 		return extract_https_url_from_repository(repository);
 	else
 		return NULL;
@@ -300,5 +267,5 @@ free_repository(struct Repository *repository)
 	repository->host = NULL;
 	repository->user = NULL;
 	repository->name = NULL;
-	repository->protocol = UNDEFINED;
+	repository->scheme = SCHEME_UNDEFINED;
 }
