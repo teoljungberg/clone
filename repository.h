@@ -15,6 +15,7 @@ struct Repository {
 	char		*user;
 	char		*name;
 	char		*login_user;
+	char		*port;
 	enum scheme	 scheme;
 };
 

@@ -55,4 +55,16 @@ if testcase "clone full ssh:// URLs outside clone's directory structure"; then
     "$(clone "ssh://anonymous@got.gameoftrees.org/got")"
 fi
 
+if testcase "clone ssh:// URLs with port outside clone's directory structure"; then
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org:2222/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org:2222/got")"
+fi
+
+if testcase "clone https:// URLs with port outside clone's directory structure"; then
+  assert_eq \
+    "git clone https://github.com:8443/user/project $HOME/src/github.com/user/project" \
+    "$(clone "https://github.com:8443/user/project")"
+fi
+
 rmdir "$tmpdir"

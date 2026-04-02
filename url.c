@@ -32,7 +32,7 @@ parse_scp(const char *pattern, struct url *url)
 static int
 parse_standard_url(const char *pattern, struct url *url, enum scheme scheme)
 {
-	const char *at, *host_end, *host_start, *proto;
+	const char *at, *colon, *host_end, *host_start, *proto;
 
 	proto = strstr(pattern, "://");
 	if (proto == NULL)
@@ -54,7 +54,16 @@ parse_standard_url(const char *pattern, struct url *url, enum scheme scheme)
 		host_start = at + 1;
 	}
 
-	url->host = strndup(host_start, host_end - host_start);
+	/* extract port from host:port if present */
+	colon = memchr(host_start, ':', host_end - host_start);
+	if (colon != NULL) {
+		url->port = strndup(colon + 1, host_end - (colon + 1));
+		if (url->port == NULL)
+			err(1, NULL);
+		url->host = strndup(host_start, colon - host_start);
+	} else {
+		url->host = strndup(host_start, host_end - host_start);
+	}
 	if (url->host == NULL)
 		err(1, NULL);
 

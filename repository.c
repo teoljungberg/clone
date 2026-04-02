@@ -39,7 +39,7 @@ copy_substring(const char *start, const char *end)
 struct Repository
 extract_repository_from_url(const struct url *url)
 {
-	struct Repository repository = {NULL, NULL, NULL, NULL, SCHEME_UNDEFINED};
+	struct Repository repository = {NULL, NULL, NULL, NULL, NULL, SCHEME_UNDEFINED};
 	const char *name_start, *slash, *suffix;
 
 	if (url == NULL)
@@ -54,6 +54,12 @@ extract_repository_from_url(const struct url *url)
 	if (url->host != NULL) {
 		repository.host = strdup(url->host);
 		if (repository.host == NULL)
+			err(1, NULL);
+	}
+
+	if (url->port != NULL) {
+		repository.port = strdup(url->port);
+		if (repository.port == NULL)
 			err(1, NULL);
 	}
 
@@ -150,7 +156,7 @@ overload_repository_with_pattern(struct Repository *repository,
 struct Repository
 extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL, NULL, SCHEME_SCP};
+	struct Repository repository = {NULL, NULL, NULL, NULL, NULL, SCHEME_SCP};
 	char cwd[PATH_MAX];
 	char *end, *start;
 	const char *suffix;
@@ -262,8 +268,14 @@ extract_https_url_from_repository(struct Repository repository)
 	int len;
 	size_t size;
 
-	len = snprintf(NULL, 0, "https://%s/%s/%s", repository.host,
-	    repository.user, repository.name);
+	if (repository.port != NULL) {
+		len = snprintf(NULL, 0, "https://%s:%s/%s/%s",
+		    repository.host, repository.port, repository.user,
+		    repository.name);
+	} else {
+		len = snprintf(NULL, 0, "https://%s/%s/%s",
+		    repository.host, repository.user, repository.name);
+	}
 	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
@@ -272,8 +284,14 @@ extract_https_url_from_repository(struct Repository repository)
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, size, "https://%s/%s/%s", repository.host,
-	    repository.user, repository.name);
+	if (repository.port != NULL) {
+		snprintf(out, size, "https://%s:%s/%s/%s",
+		    repository.host, repository.port, repository.user,
+		    repository.name);
+	} else {
+		snprintf(out, size, "https://%s/%s/%s", repository.host,
+		    repository.user, repository.name);
+	}
 
 	return out;
 }
@@ -285,8 +303,14 @@ extract_ssh_url_string_from_repository(struct Repository repository)
 	int len;
 	size_t size;
 
-	len = snprintf(NULL, 0, "ssh://%s@%s/%s", repository.user,
-	    repository.host, repository.name);
+	if (repository.port != NULL) {
+		len = snprintf(NULL, 0, "ssh://%s@%s:%s/%s",
+		    repository.user, repository.host, repository.port,
+		    repository.name);
+	} else {
+		len = snprintf(NULL, 0, "ssh://%s@%s/%s",
+		    repository.user, repository.host, repository.name);
+	}
 	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
@@ -295,8 +319,14 @@ extract_ssh_url_string_from_repository(struct Repository repository)
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, size, "ssh://%s@%s/%s", repository.user,
-	    repository.host, repository.name);
+	if (repository.port != NULL) {
+		snprintf(out, size, "ssh://%s@%s:%s/%s",
+		    repository.user, repository.host, repository.port,
+		    repository.name);
+	} else {
+		snprintf(out, size, "ssh://%s@%s/%s", repository.user,
+		    repository.host, repository.name);
+	}
 
 	return out;
 }
@@ -321,9 +351,11 @@ free_repository(struct Repository *repository)
 	free(repository->user);
 	free(repository->name);
 	free(repository->login_user);
+	free(repository->port);
 	repository->host = NULL;
 	repository->user = NULL;
 	repository->name = NULL;
 	repository->login_user = NULL;
+	repository->port = NULL;
 	repository->scheme = SCHEME_UNDEFINED;
 }
