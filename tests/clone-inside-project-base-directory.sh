@@ -18,6 +18,15 @@ if testcase "clone full git+ssh git.sr.ht URLs inside clone's directory structur
     "$(clone "git@git.sr.ht:~user/project.git")"
 fi
 
+if testcase "clone full ssh:// URLs inside clone's directory structure"; then
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org/got.git")"
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org/got")"
+fi
+
 if testcase "clone full https github.com URLs inside clone's directory structure"; then
   assert_eq \
     "git clone https://github.com/user/project $HOME/src/github.com/user/project" \

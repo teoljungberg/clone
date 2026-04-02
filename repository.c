@@ -45,7 +45,8 @@ extract_repository_from_url(const struct url *url)
 	if (url == NULL)
 		return repository;
 
-	if (url->scheme != SCHEME_SCP && url->scheme != SCHEME_HTTPS)
+	if (url->scheme != SCHEME_SCP && url->scheme != SCHEME_HTTPS &&
+	    url->scheme != SCHEME_SSH)
 		return repository;
 
 	repository.scheme = url->scheme;
@@ -59,6 +60,26 @@ extract_repository_from_url(const struct url *url)
 	if (url->path == NULL)
 		return repository;
 
+	if (url->scheme == SCHEME_SSH) {
+		/* ssh://user@host/repo -- user from URL, name from path */
+		if (url->user != NULL) {
+			repository.user = strdup(url->user);
+			if (repository.user == NULL)
+				err(1, NULL);
+		}
+		suffix = find_git_suffix(url->path);
+		if (suffix != NULL) {
+			repository.name = strndup(url->path,
+			    suffix - url->path);
+		} else {
+			repository.name = strdup(url->path);
+		}
+		if (repository.name == NULL)
+			err(1, NULL);
+		return repository;
+	}
+
+	/* SCP and HTTPS: path is user/repo */
 	slash = strchr(url->path, '/');
 	if (slash == NULL)
 		return repository;
@@ -248,12 +269,37 @@ extract_https_url_from_repository(struct Repository repository)
 }
 
 char *
+extract_ssh_url_string_from_repository(struct Repository repository)
+{
+	char *out;
+	int len;
+	size_t size;
+
+	len = snprintf(NULL, 0, "ssh://%s@%s/%s", repository.user,
+	    repository.host, repository.name);
+	if (len < 0 || (size_t)len > SIZE_MAX - 1)
+		return NULL;
+
+	size = (size_t)len + 1;
+	out = malloc(size);
+	if (out == NULL)
+		return NULL;
+
+	snprintf(out, size, "ssh://%s@%s/%s", repository.user,
+	    repository.host, repository.name);
+
+	return out;
+}
+
+char *
 extract_url_from_repository(struct Repository repository)
 {
 	if (repository.scheme == SCHEME_SCP)
 		return extract_ssh_url_from_repository(repository);
 	else if (repository.scheme == SCHEME_HTTPS)
 		return extract_https_url_from_repository(repository);
+	else if (repository.scheme == SCHEME_SSH)
+		return extract_ssh_url_string_from_repository(repository);
 	else
 		return NULL;
 }

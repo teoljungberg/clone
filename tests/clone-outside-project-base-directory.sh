@@ -37,4 +37,13 @@ if testcase "clone full https:// any other URLs outside clone's directory struct
     "$(clone "https://example.com/user/project.git")"
 fi
 
+if testcase "clone full ssh:// URLs outside clone's directory structure"; then
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org/got.git")"
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org/got")"
+fi
+
 rmdir "$tmpdir"

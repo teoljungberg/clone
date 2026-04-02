@@ -113,6 +113,8 @@ contains_path_traversal(const char *str)
 		return 1;
 	if (strchr(str, '/') != NULL)
 		return 1;
+	if (strchr(str, ':') != NULL)
+		return 1;
 	return 0;
 }
 
@@ -165,8 +167,7 @@ main(int argc, char *argv[])
 	pattern = argv[0];
 
 	if (parse_url(pattern, &parsed) == 0) {
-		if (parsed.scheme == SCHEME_GIT ||
-		    parsed.scheme == SCHEME_SSH) {
+		if (parsed.scheme == SCHEME_GIT) {
 			free_url(&parsed);
 			errx(1, "could not extract repository: %s",
 			    pattern);
