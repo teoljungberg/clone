@@ -39,7 +39,7 @@ copy_substring(const char *start, const char *end)
 struct Repository
 extract_repository_from_url(const struct url *url)
 {
-	struct Repository repository = {NULL, NULL, NULL, SCHEME_UNDEFINED};
+	struct Repository repository = {NULL, NULL, NULL, NULL, SCHEME_UNDEFINED};
 	const char *name_start, *slash, *suffix;
 
 	if (url == NULL)
@@ -77,6 +77,13 @@ extract_repository_from_url(const struct url *url)
 		if (repository.name == NULL)
 			err(1, NULL);
 		return repository;
+	}
+
+	/* SCP: preserve SSH login user for URL reconstruction */
+	if (url->scheme == SCHEME_SCP && url->user != NULL) {
+		repository.login_user = strdup(url->user);
+		if (repository.login_user == NULL)
+			err(1, NULL);
 	}
 
 	/* SCP and HTTPS: path is user/repo */
@@ -143,7 +150,7 @@ overload_repository_with_pattern(struct Repository *repository,
 struct Repository
 extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL, SCHEME_SCP};
+	struct Repository repository = {NULL, NULL, NULL, NULL, SCHEME_SCP};
 	char cwd[PATH_MAX];
 	char *end, *start;
 	const char *suffix;
@@ -226,10 +233,13 @@ char *
 extract_ssh_url_from_repository(struct Repository repository)
 {
 	char *out;
+	const char *login;
 	int len;
 	size_t size;
 
-	len = snprintf(NULL, 0, "git@%s:%s/%s", repository.host,
+	login = repository.login_user != NULL ? repository.login_user : "git";
+
+	len = snprintf(NULL, 0, "%s@%s:%s/%s", login, repository.host,
 	    repository.user, repository.name);
 	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
@@ -239,7 +249,7 @@ extract_ssh_url_from_repository(struct Repository repository)
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, size, "git@%s:%s/%s", repository.host,
+	snprintf(out, size, "%s@%s:%s/%s", login, repository.host,
 	    repository.user, repository.name);
 
 	return out;
@@ -310,8 +320,10 @@ free_repository(struct Repository *repository)
 	free(repository->host);
 	free(repository->user);
 	free(repository->name);
+	free(repository->login_user);
 	repository->host = NULL;
 	repository->user = NULL;
 	repository->name = NULL;
+	repository->login_user = NULL;
 	repository->scheme = SCHEME_UNDEFINED;
 }

@@ -81,7 +81,7 @@ parse_url(const char *pattern, struct url *url)
 	if (strncmp(pattern, "ssh://", 6) == 0)
 		return parse_standard_url(pattern, url, SCHEME_SSH);
 
-	if (fnmatch("git@*:*/*", pattern, 0) == 0)
+	if (fnmatch("*@*:*/*", pattern, 0) == 0)
 		return parse_scp(pattern, url);
 
 	return -1;
