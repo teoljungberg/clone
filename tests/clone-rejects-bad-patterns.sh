@@ -11,6 +11,9 @@ if testcase "clone rejects bad patterns - http://"; then
   assert_eq \
     "clone: could not extract repository: http://github.com/user/project" \
     "$(clone "http://github.com/user/project")"
+  assert_eq \
+    "clone: could not extract repository: http://github.com:8080/user/project" \
+    "$(clone "http://github.com:8080/user/project")"
 fi
 
 if testcase "clone rejects bad patterns - ftp://"; then
@@ -56,6 +59,15 @@ if testcase "clone rejects path traversal in repository name"; then
   assert_eq \
     "clone: could not extract repository: ssh://anonymous@got.gameoftrees.org/../got" \
     "$(clone "ssh://anonymous@got.gameoftrees.org/../got")"
+fi
+
+if testcase "clone rejects path traversal in port"; then
+  assert_eq \
+    "clone: could not extract repository: ssh://user@host:../22/got" \
+    "$(clone "ssh://user@host:../22/got")"
+  assert_eq \
+    "clone: could not extract repository: https://host:../user/repo" \
+    "$(clone "https://host:../user/repo")"
 fi
 
 if testcase "clone rejects bad patterns - ssh:// deep path"; then

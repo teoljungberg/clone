@@ -131,6 +131,9 @@ invalid_repository(struct Repository repository)
 	    contains_path_traversal(repository.user) ||
 	    contains_path_traversal(repository.name))
 		return 1;
+	if (repository.port != NULL &&
+	    contains_path_traversal(repository.port))
+		return 1;
 	return 0;
 }
 

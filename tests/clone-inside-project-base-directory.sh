@@ -27,6 +27,18 @@ if testcase "clone full ssh:// URLs inside clone's directory structure"; then
     "$(clone "ssh://anonymous@got.gameoftrees.org/got")"
 fi
 
+if testcase "clone full ssh:// URLs with port inside clone's directory structure"; then
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org:2222/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org:2222/got")"
+fi
+
+if testcase "clone full SCP URLs with non-git login user inside clone's directory structure"; then
+  assert_eq \
+    "git clone deploy@github.com:user/project $HOME/src/github.com/user/project" \
+    "$(clone "deploy@github.com:user/project")"
+fi
+
 if testcase "clone full https github.com URLs inside clone's directory structure"; then
   assert_eq \
     "git clone https://github.com/user/project $HOME/src/github.com/user/project" \
@@ -34,6 +46,12 @@ if testcase "clone full https github.com URLs inside clone's directory structure
   assert_eq \
     "git clone https://github.com/user/project $HOME/src/github.com/user/project" \
     "$(clone "https://github.com/user/project.git")"
+fi
+
+if testcase "clone full https:// URLs with port inside clone's directory structure"; then
+  assert_eq \
+    "git clone https://github.com:8443/user/project $HOME/src/github.com/user/project" \
+    "$(clone "https://github.com:8443/user/project")"
 fi
 
 if testcase "clone user/repository_name patterns inside clone's directory structure"; then
