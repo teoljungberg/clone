@@ -3,9 +3,13 @@
 
 enum scheme {
 	SCHEME_UNDEFINED,
+
+	/* Supported */
 	SCHEME_SCP,	/* [user@]host:path */
 	SCHEME_SSH,	/* ssh://[user@]host/path */
 	SCHEME_HTTPS,	/* https://host/path */
+
+	/* Unsupported: no authentication, transmitted in cleartext */
 	SCHEME_GIT,	/* git://host/path */
 	SCHEME_HTTP,	/* http://host/path */
 	SCHEME_FTP,	/* ftp[s]://host/path */
