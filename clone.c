@@ -174,7 +174,7 @@ main(int argc, char *argv[])
 		    parsed.scheme == SCHEME_HTTP ||
 		    parsed.scheme == SCHEME_FTP) {
 			free_url(&parsed);
-			errx(1, "could not extract repository: %s",
+			errx(1, "unsupported protocol: %s",
 			    pattern);
 		}
 		repository = extract_repository_from_url(&parsed);

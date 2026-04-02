@@ -1,27 +1,27 @@
 if testcase "clone rejects bad patterns - git://"; then
   assert_eq \
-    "clone: could not extract repository: git://github.com/user/project" \
+    "clone: unsupported protocol: git://github.com/user/project" \
     "$(clone "git://github.com/user/project")"
   assert_eq \
-    "clone: could not extract repository: git://github.com/user/project.git" \
+    "clone: unsupported protocol: git://github.com/user/project.git" \
     "$(clone "git://github.com/user/project.git")"
 fi
 
 if testcase "clone rejects bad patterns - http://"; then
   assert_eq \
-    "clone: could not extract repository: http://github.com/user/project" \
+    "clone: unsupported protocol: http://github.com/user/project" \
     "$(clone "http://github.com/user/project")"
   assert_eq \
-    "clone: could not extract repository: http://github.com:8080/user/project" \
+    "clone: unsupported protocol: http://github.com:8080/user/project" \
     "$(clone "http://github.com:8080/user/project")"
 fi
 
 if testcase "clone rejects bad patterns - ftp://"; then
   assert_eq \
-    "clone: could not extract repository: ftp://github.com/user/project" \
+    "clone: unsupported protocol: ftp://github.com/user/project" \
     "$(clone "ftp://github.com/user/project")"
   assert_eq \
-    "clone: could not extract repository: ftps://github.com/user/project" \
+    "clone: unsupported protocol: ftps://github.com/user/project" \
     "$(clone "ftps://github.com/user/project")"
 fi
 
