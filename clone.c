@@ -167,7 +167,9 @@ main(int argc, char *argv[])
 	pattern = argv[0];
 
 	if (parse_url(pattern, &parsed) == 0) {
-		if (parsed.scheme == SCHEME_GIT) {
+		if (parsed.scheme == SCHEME_GIT ||
+		    parsed.scheme == SCHEME_HTTP ||
+		    parsed.scheme == SCHEME_FTP) {
 			free_url(&parsed);
 			errx(1, "could not extract repository: %s",
 			    pattern);

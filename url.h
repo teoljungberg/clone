@@ -7,6 +7,8 @@ enum scheme {
 	SCHEME_SSH,	/* ssh://[user@]host/path */
 	SCHEME_HTTPS,	/* https://host/path */
 	SCHEME_GIT,	/* git://host/path */
+	SCHEME_HTTP,	/* http://host/path */
+	SCHEME_FTP,	/* ftp[s]://host/path */
 };
 
 struct url {

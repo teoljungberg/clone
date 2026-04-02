@@ -90,6 +90,13 @@ parse_url(const char *pattern, struct url *url)
 	if (strncmp(pattern, "ssh://", 6) == 0)
 		return parse_standard_url(pattern, url, SCHEME_SSH);
 
+	if (strncmp(pattern, "http://", 7) == 0)
+		return parse_standard_url(pattern, url, SCHEME_HTTP);
+	if (strncmp(pattern, "ftps://", 7) == 0)
+		return parse_standard_url(pattern, url, SCHEME_FTP);
+	if (strncmp(pattern, "ftp://", 6) == 0)
+		return parse_standard_url(pattern, url, SCHEME_FTP);
+
 	if (fnmatch("*@*:*/*", pattern, 0) == 0)
 		return parse_scp(pattern, url);
 

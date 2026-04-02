@@ -7,6 +7,21 @@ if testcase "clone rejects bad patterns - git://"; then
     "$(clone "git://github.com/user/project.git")"
 fi
 
+if testcase "clone rejects bad patterns - http://"; then
+  assert_eq \
+    "clone: could not extract repository: http://github.com/user/project" \
+    "$(clone "http://github.com/user/project")"
+fi
+
+if testcase "clone rejects bad patterns - ftp://"; then
+  assert_eq \
+    "clone: could not extract repository: ftp://github.com/user/project" \
+    "$(clone "ftp://github.com/user/project")"
+  assert_eq \
+    "clone: could not extract repository: ftps://github.com/user/project" \
+    "$(clone "ftps://github.com/user/project")"
+fi
+
 if testcase "clone rejects path traversal in hostname"; then
   assert_eq \
     "clone: could not extract repository: git@../../etc:user/repo" \
