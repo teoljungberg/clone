@@ -39,7 +39,7 @@ copy_substring(const char *start, const char *end)
 struct Repository
 extract_repository_from_url(const struct url *url)
 {
-	struct Repository repository = {NULL, NULL, NULL, NULL, NULL, SCHEME_UNDEFINED};
+	struct Repository repository = {0};
 	const char *name_start, *slash, *suffix;
 
 	if (url == NULL)
@@ -156,7 +156,7 @@ overload_repository_with_pattern(struct Repository *repository,
 struct Repository
 extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
-	struct Repository repository = {NULL, NULL, NULL, NULL, NULL, SCHEME_SCP};
+	struct Repository repository = {.scheme = SCHEME_SCP};
 	char cwd[PATH_MAX];
 	char *end, *start;
 	const char *suffix;

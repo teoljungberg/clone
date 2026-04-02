@@ -140,7 +140,7 @@ invalid_repository(struct Repository repository)
 int
 main(int argc, char *argv[])
 {
-	struct Repository repository = { NULL, NULL, NULL, NULL, NULL, SCHEME_UNDEFINED };
+	struct Repository repository = {0};
 	struct url parsed = {0};
 	char *cmd[] = { "git", "clone", NULL, NULL, NULL };
 	char *clone_path, *clone_url, *location, *pattern;
