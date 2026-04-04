@@ -21,7 +21,7 @@ CFLAGS+=	-DCLONE_PATH=\"${CLONE_PATH}\"
 # Uncomment to enable debugging
 # CFLAGS+=	-g -DDEBUG=1
 
-.PHONY: all clean install lint fmt test
+.PHONY: all clean install uninstall lint fmt test
 
 all: ${PROG}
 
@@ -36,6 +36,10 @@ install: ${PROG}
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	${INSTALL_PROGRAM} ${PROG} ${DESTDIR}${PREFIX}/bin
 	${INSTALL_MAN} ${PROG}.1 ${DESTDIR}${MANPREFIX}/man1
+
+uninstall:
+	rm -f ${DESTDIR}${PREFIX}/bin/${PROG}
+	rm -f ${DESTDIR}${MANPREFIX}/man1/${PROG}.1
 
 lint:
 	mandoc -Tlint -Wstyle ${PROG}.1
