@@ -40,12 +40,12 @@ expand_tilde(const char *path)
 
 	/* check for overflow */
 	if (home_len > SIZE_MAX - path_len)
-		return NULL;
+		errx(1, "path too long");
 	total_len = home_len + path_len;
 
 	expanded = malloc(total_len);
 	if (expanded == NULL)
-		return NULL;
+		err(1, NULL);
 
 	snprintf(expanded, total_len, "%s%s", home, path + 1);
 
@@ -225,14 +225,22 @@ main(int argc, char *argv[])
 	else if (cwd_is_inside_clone_path(clone_path))
 		repository = extract_repository_from_cwd(clone_path, pattern);
 
-	if (invalid_repository(repository))
+	if (invalid_repository(repository)) {
+		free(clone_path);
+		free_repository(&repository);
 		errx(1, "could not extract repository: %s", pattern);
+	}
 
 	location = extract_location_from_repository(clone_path, repository);
 	url = extract_url_from_repository(repository);
 
-	if (location == NULL || url == NULL)
+	if (location == NULL || url == NULL) {
+		free(clone_path);
+		free(location);
+		free(url);
+		free_repository(&repository);
 		err(1, NULL);
+	}
 
 	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
