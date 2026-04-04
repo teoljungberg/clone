@@ -40,12 +40,12 @@ expand_tilde(const char *path)
 
 	/* check for overflow */
 	if (home_len > SIZE_MAX - path_len)
-		return NULL;
+		errx(1, "path too long");
 	total_len = home_len + path_len;
 
 	expanded = malloc(total_len);
 	if (expanded == NULL)
-		return NULL;
+		err(1, NULL);
 
 	snprintf(expanded, total_len, "%s%s", home, path + 1);
 
