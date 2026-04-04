@@ -1,5 +1,5 @@
-#ifndef _CLONE_H_
-#define _CLONE_H_
+#ifndef _CLONE_CLONE_H_
+#define _CLONE_CLONE_H_
 
 #include <sys/param.h>
 
@@ -24,8 +24,4 @@
 #define pledge(promises, execpromises) (0)
 #endif
 
-int	valid_git_ssh_pattern(const char *);
-int	valid_git_https_pattern(const char *);
-int	is_url_pattern(const char *);
-
-#endif /* _CLONE_H_ */
+#endif /* _CLONE_CLONE_H_ */

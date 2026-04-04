@@ -1,5 +1,6 @@
 #include "clone.h"
 #include "repository.h"
+#include "url.h"
 
 extern char *__progname;
 
@@ -83,64 +84,6 @@ get_clone_path(void)
 }
 
 int
-valid_git_ssh_pattern(const char *pattern)
-{
-	const char *valid_patterns[] = {
-		"git@*:*/*.git",
-		"git@*:*/*",
-	};
-
-	for (size_t i = 0; i < nitems(valid_patterns); i++) {
-		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
-			return 1;
-	}
-
-	return 0;
-}
-
-int
-valid_git_https_pattern(const char *pattern)
-{
-	const char *valid_patterns[] = {
-		"https://*/*/*.git",
-		"https://*/*/*",
-	};
-
-	for (size_t i = 0; i < nitems(valid_patterns); i++) {
-		if (fnmatch(valid_patterns[i], pattern, 0) == 0)
-			return 1;
-	}
-
-	return 0;
-}
-
-int
-unsupported_git_clone_patterns(const char *pattern)
-{
-	const char *invalid_patterns[] = {
-		"git://*/*",
-		"git://*/*.git",
-		"ssh://git@*/*",
-		"ssh://git@*/*.git",
-	};
-
-	for (size_t i = 0; i < nitems(invalid_patterns); i++) {
-		if (fnmatch(invalid_patterns[i], pattern, 0) == 0)
-			return 1;
-	}
-
-	return 0;
-}
-
-int
-is_url_pattern(const char *pattern)
-{
-	return valid_git_ssh_pattern(pattern) ||
-	    valid_git_https_pattern(pattern) ||
-	    unsupported_git_clone_patterns(pattern);
-}
-
-int
 cwd_is_inside_clone_path(const char *clone_path)
 {
 	char cwd[PATH_MAX];
@@ -170,6 +113,8 @@ contains_path_traversal(const char *str)
 		return 1;
 	if (strchr(str, '/') != NULL)
 		return 1;
+	if (strchr(str, ':') != NULL)
+		return 1;
 	return 0;
 }
 
@@ -177,7 +122,7 @@ int
 invalid_repository(struct Repository repository)
 {
 	if (repository.host == NULL || repository.user == NULL ||
-	    repository.name == NULL || repository.protocol == UNDEFINED)
+	    repository.name == NULL || repository.scheme == SCHEME_UNDEFINED)
 		return 1;
 	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
 	    repository.name[0] == '\0')
@@ -186,15 +131,19 @@ invalid_repository(struct Repository repository)
 	    contains_path_traversal(repository.user) ||
 	    contains_path_traversal(repository.name))
 		return 1;
+	if (repository.port != NULL &&
+	    contains_path_traversal(repository.port))
+		return 1;
 	return 0;
 }
 
 int
 main(int argc, char *argv[])
 {
-	struct Repository repository = { NULL, NULL, NULL, UNDEFINED };
+	struct Repository repository = {0};
+	struct url parsed = {0};
 	char *cmd[] = { "git", "clone", NULL, NULL, NULL };
-	char *clone_path, *location, *pattern, *url;
+	char *clone_path, *clone_url, *location, *pattern;
 	int nflag = 0;
 	int ch;
 
@@ -220,10 +169,19 @@ main(int argc, char *argv[])
 
 	pattern = argv[0];
 
-	if (is_url_pattern(pattern))
-		repository = extract_repository_from_pattern(pattern);
-	else if (cwd_is_inside_clone_path(clone_path))
+	if (parse_url(pattern, &parsed) == 0) {
+		if (parsed.scheme == SCHEME_GIT ||
+		    parsed.scheme == SCHEME_HTTP ||
+		    parsed.scheme == SCHEME_FTP) {
+			free_url(&parsed);
+			errx(1, "unsupported protocol: %s",
+			    pattern);
+		}
+		repository = extract_repository_from_url(&parsed);
+		free_url(&parsed);
+	} else if (cwd_is_inside_clone_path(clone_path)) {
 		repository = extract_repository_from_cwd(clone_path, pattern);
+	}
 
 	if (invalid_repository(repository)) {
 		free(clone_path);
@@ -232,26 +190,26 @@ main(int argc, char *argv[])
 	}
 
 	location = extract_location_from_repository(clone_path, repository);
-	url = extract_url_from_repository(repository);
+	clone_url = extract_url_from_repository(repository);
 
-	if (location == NULL || url == NULL) {
+	if (location == NULL || clone_url == NULL) {
 		free(clone_path);
 		free(location);
-		free(url);
+		free(clone_url);
 		free_repository(&repository);
 		err(1, NULL);
 	}
 
 	if (nflag) {
-		fprintf(stdout, "%s %s %s\n", "git clone", url, location);
+		fprintf(stdout, "%s %s %s\n", "git clone", clone_url, location);
 		free(clone_path);
 		free(location);
-		free(url);
+		free(clone_url);
 		free_repository(&repository);
 		return 0;
 	}
 
-	cmd[2] = url;
+	cmd[2] = clone_url;
 	cmd[3] = location;
 	execvp(cmd[0], cmd);
 	err(1, "git");

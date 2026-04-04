@@ -16,13 +16,11 @@ current directory structure to determine the clone path for a repository.
 The program accepts the following patterns for the repository:
 .Bl -dash
 .It
-git@host:user/repository
+[user@]host:user/repository[.git]
 .It
-git@host:user/repository.git
+ssh://[user@]host[:port]/repository[.git]
 .It
-https://host/user/repository
-.It
-https://host/user/repository.git
+https://host[:port]/user/repository[.git]
 .It
 user/repository
 .It
@@ -31,6 +29,16 @@ repository
 .Pp
 The two latter are only available if the program is run inside the known
 directory structure.
+.Pp
+The following protocols are not supported:
+.Bl -dash
+.It
+git:// \(en insecure, no authentication
+.It
+http:// \(en insecure, use https:// instead
+.It
+ftp[s]:// \(en deprecated
+.El
 .Sh DIRECTORY STRUCTURE
 The default directory pattern for the cloned repositories is:
 .Pp
@@ -58,6 +66,10 @@ To clone a repository from GitHub over ssh:
 To clone a repository from GitHub over https:
 .Pp
 .Dl % clone https://github.com/user/repository
+.Pp
+To clone a repository using an ssh:// URL:
+.Pp
+.Dl % clone ssh://anonymous@got.gameoftrees.org/got
 .Pp
 To clone a repository from a custom git host:
 .Pp
