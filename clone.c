@@ -183,22 +183,14 @@ main(int argc, char *argv[])
 		repository = extract_repository_from_cwd(clone_path, pattern);
 	}
 
-	if (invalid_repository(repository)) {
-		free(clone_path);
-		free_repository(&repository);
+	if (invalid_repository(repository))
 		errx(1, "could not extract repository: %s", pattern);
-	}
 
 	location = extract_location_from_repository(clone_path, repository);
 	clone_url = extract_url_from_repository(repository);
 
-	if (location == NULL || clone_url == NULL) {
-		free(clone_path);
-		free(location);
-		free(clone_url);
-		free_repository(&repository);
+	if (location == NULL || clone_url == NULL)
 		err(1, NULL);
-	}
 
 	if (nflag) {
 		fprintf(stdout, "%s %s %s\n", "git clone", clone_url, location);
