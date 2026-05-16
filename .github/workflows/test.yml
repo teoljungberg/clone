@@ -62,3 +62,14 @@ jobs:
         run: |
           make
           make test
+
+  ci:
+    name: CI
+    needs: [linux, macos, openbsd]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - run: |
+          [[ "${{ needs.linux.result }}" == "success" ]] || exit 1
+          [[ "${{ needs.macos.result }}" == "success" ]] || exit 1
+          [[ "${{ needs.openbsd.result }}" == "success" ]] || exit 1
