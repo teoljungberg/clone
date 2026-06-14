@@ -1,5 +1,4 @@
 #include "repository.h"
-#include "url.h"
 
 #include <err.h>
 #include <fnmatch.h>
