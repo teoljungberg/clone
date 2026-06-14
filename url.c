@@ -1,5 +1,9 @@
-#include "clone.h"
 #include "url.h"
+
+#include <err.h>
+#include <fnmatch.h>
+#include <stdlib.h>
+#include <string.h>
 
 static int
 parse_scp(const char *pattern, struct url *url)

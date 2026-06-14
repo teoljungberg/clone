@@ -1,6 +1,5 @@
 #include "clone.h"
 #include "repository.h"
-#include "url.h"
 
 extern char *__progname;
 
@@ -84,64 +83,9 @@ get_clone_path(void)
 }
 
 int
-cwd_is_inside_clone_path(const char *clone_path)
-{
-	char cwd[PATH_MAX];
-	size_t len;
-
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
-		return 0;
-
-	/* clone_path must match at start of cwd */
-	len = strlen(clone_path);
-	if (strncmp(cwd, clone_path, len) != 0)
-		return 0;
-
-	/* must be followed by '/' or end of string */
-	if (cwd[len] != '/' && cwd[len] != '\0')
-		return 0;
-
-	return 1;
-}
-
-static int
-contains_path_traversal(const char *str)
-{
-	if (str == NULL)
-		return 1;
-	if (strstr(str, "..") != NULL)
-		return 1;
-	if (strchr(str, '/') != NULL)
-		return 1;
-	if (strchr(str, ':') != NULL)
-		return 1;
-	return 0;
-}
-
-int
-invalid_repository(struct Repository repository)
-{
-	if (repository.host == NULL || repository.user == NULL ||
-	    repository.name == NULL || repository.scheme == SCHEME_UNDEFINED)
-		return 1;
-	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
-	    repository.name[0] == '\0')
-		return 1;
-	if (contains_path_traversal(repository.host) ||
-	    contains_path_traversal(repository.user) ||
-	    contains_path_traversal(repository.name))
-		return 1;
-	if (repository.port != NULL &&
-	    contains_path_traversal(repository.port))
-		return 1;
-	return 0;
-}
-
-int
 main(int argc, char *argv[])
 {
 	struct Repository repository = {0};
-	struct url parsed = {0};
 	char *cmd[] = { "git", "clone", NULL, NULL, NULL };
 	char *clone_path, *clone_url, *location, *pattern;
 	int nflag = 0;
@@ -169,18 +113,8 @@ main(int argc, char *argv[])
 
 	pattern = argv[0];
 
-	if (parse_url(pattern, &parsed) == 0) {
-		if (invalid_scheme(parsed.scheme)) {
-			free_url(&parsed);
-			errx(1, "unsupported protocol: %s",
-			    pattern);
-		}
-		repository = extract_repository_from_url(&parsed);
-		free_url(&parsed);
-	} else if (cwd_is_inside_clone_path(clone_path)) {
-		repository = extract_repository_from_cwd(clone_path, pattern);
-	}
-
+	if (extract_repository(clone_path, pattern, &repository) == -1)
+		errx(1, "unsupported protocol: %s", pattern);
 	if (invalid_repository(repository))
 		errx(1, "could not extract repository: %s", pattern);
 

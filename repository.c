@@ -1,5 +1,9 @@
-#include "clone.h"
 #include "repository.h"
+#include "url.h"
+
+#include <err.h>
+#include <stdarg.h>
+#include <stdint.h>
 
 #define GIT_SUFFIX	".git"
 #define GIT_SUFFIX_LEN	(sizeof(GIT_SUFFIX) - 1)
@@ -211,16 +215,98 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	return repository;
 }
 
-char *
-extract_location_from_repository(const char *clone_path,
-    struct Repository repository)
+static int
+contains_path_traversal(const char *str)
 {
-	char *out;
+	if (str == NULL)
+		return 1;
+	if (strstr(str, "..") != NULL)
+		return 1;
+	if (strchr(str, '/') != NULL)
+		return 1;
+	if (strchr(str, ':') != NULL)
+		return 1;
+	return 0;
+}
+
+int
+invalid_repository(struct Repository repository)
+{
+	if (repository.host == NULL || repository.user == NULL ||
+	    repository.name == NULL || repository.scheme == SCHEME_UNDEFINED)
+		return 1;
+	if (repository.host[0] == '\0' || repository.user[0] == '\0' ||
+	    repository.name[0] == '\0')
+		return 1;
+	if (contains_path_traversal(repository.host) ||
+	    contains_path_traversal(repository.user) ||
+	    contains_path_traversal(repository.name))
+		return 1;
+	if (repository.port != NULL &&
+	    contains_path_traversal(repository.port))
+		return 1;
+	return 0;
+}
+
+static int
+cwd_is_inside_clone_path(const char *clone_path)
+{
+	char cwd[PATH_MAX];
+	size_t len;
+
+	if (getcwd(cwd, sizeof(cwd)) == NULL)
+		return 0;
+
+	/* clone_path must match at start of cwd */
+	len = strlen(clone_path);
+	if (strncmp(cwd, clone_path, len) != 0)
+		return 0;
+
+	/* must be followed by '/' or end of string */
+	if (cwd[len] != '/' && cwd[len] != '\0')
+		return 0;
+
+	return 1;
+}
+
+int
+extract_repository(const char *clone_path, const char *pattern,
+    struct Repository *repository)
+{
+	struct url parsed = {0};
+
+	*repository = (struct Repository){0};
+
+	if (parse_url(pattern, &parsed) == 0) {
+		if (invalid_scheme(parsed.scheme)) {
+			free_url(&parsed);
+			return -1;
+		}
+		*repository = extract_repository_from_url(&parsed);
+		free_url(&parsed);
+		return 0;
+	}
+
+	if (cwd_is_inside_clone_path(clone_path)) {
+		*repository = extract_repository_from_cwd(clone_path, pattern);
+		return 0;
+	}
+
+	return 0;
+}
+
+static char *
+format_string(const char *fmt, ...)
+{
+	va_list ap;
 	int len;
 	size_t size;
+	char *out;
 
-	len = snprintf(NULL, 0, "%s/%s/%s/%s", clone_path,
-	    repository.host, repository.user, repository.name);
+	va_start(ap, fmt);
+	len = vsnprintf(NULL, 0, fmt, ap);
+	va_end(ap);
+
 	if (len < 0 || (size_t)len > SIZE_MAX - 1)
 		return NULL;
 
@@ -229,106 +315,54 @@ extract_location_from_repository(const char *clone_path,
 	if (out == NULL)
 		return NULL;
 
-	snprintf(out, size, "%s/%s/%s/%s", clone_path,
-	    repository.host, repository.user, repository.name);
+	va_start(ap, fmt);
+	vsnprintf(out, size, fmt, ap);
+	va_end(ap);
 
 	return out;
+}
+
+char *
+extract_location_from_repository(const char *clone_path,
+    struct Repository repository)
+{
+	return format_string("%s/%s/%s/%s", clone_path,
+	    repository.host, repository.user, repository.name);
 }
 
 char *
 extract_ssh_url_from_repository(struct Repository repository)
 {
-	char *out;
 	const char *login;
-	int len;
-	size_t size;
 
 	login = repository.login_user != NULL ? repository.login_user : "git";
 
-	len = snprintf(NULL, 0, "%s@%s:%s/%s", login, repository.host,
+	return format_string("%s@%s:%s/%s", login, repository.host,
 	    repository.user, repository.name);
-	if (len < 0 || (size_t)len > SIZE_MAX - 1)
-		return NULL;
-
-	size = (size_t)len + 1;
-	out = malloc(size);
-	if (out == NULL)
-		return NULL;
-
-	snprintf(out, size, "%s@%s:%s/%s", login, repository.host,
-	    repository.user, repository.name);
-
-	return out;
 }
 
 char *
 extract_https_url_from_repository(struct Repository repository)
 {
-	char *out;
-	int len;
-	size_t size;
-
-	if (repository.port != NULL) {
-		len = snprintf(NULL, 0, "https://%s:%s/%s/%s",
+	if (repository.port != NULL)
+		return format_string("https://%s:%s/%s/%s",
 		    repository.host, repository.port, repository.user,
 		    repository.name);
-	} else {
-		len = snprintf(NULL, 0, "https://%s/%s/%s",
+	else
+		return format_string("https://%s/%s/%s",
 		    repository.host, repository.user, repository.name);
-	}
-	if (len < 0 || (size_t)len > SIZE_MAX - 1)
-		return NULL;
-
-	size = (size_t)len + 1;
-	out = malloc(size);
-	if (out == NULL)
-		return NULL;
-
-	if (repository.port != NULL) {
-		snprintf(out, size, "https://%s:%s/%s/%s",
-		    repository.host, repository.port, repository.user,
-		    repository.name);
-	} else {
-		snprintf(out, size, "https://%s/%s/%s", repository.host,
-		    repository.user, repository.name);
-	}
-
-	return out;
 }
 
 char *
 extract_ssh_url_string_from_repository(struct Repository repository)
 {
-	char *out;
-	int len;
-	size_t size;
-
-	if (repository.port != NULL) {
-		len = snprintf(NULL, 0, "ssh://%s@%s:%s/%s",
+	if (repository.port != NULL)
+		return format_string("ssh://%s@%s:%s/%s",
 		    repository.user, repository.host, repository.port,
 		    repository.name);
-	} else {
-		len = snprintf(NULL, 0, "ssh://%s@%s/%s",
+	else
+		return format_string("ssh://%s@%s/%s",
 		    repository.user, repository.host, repository.name);
-	}
-	if (len < 0 || (size_t)len > SIZE_MAX - 1)
-		return NULL;
-
-	size = (size_t)len + 1;
-	out = malloc(size);
-	if (out == NULL)
-		return NULL;
-
-	if (repository.port != NULL) {
-		snprintf(out, size, "ssh://%s@%s:%s/%s",
-		    repository.user, repository.host, repository.port,
-		    repository.name);
-	} else {
-		snprintf(out, size, "ssh://%s@%s/%s", repository.user,
-		    repository.host, repository.name);
-	}
-
-	return out;
 }
 
 char *
