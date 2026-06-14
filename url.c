@@ -78,28 +78,34 @@ parse_standard_url(const char *pattern, struct url *url, enum scheme scheme)
 	return 0;
 }
 
+static const struct {
+	const char *prefix;
+	size_t      len;
+	enum scheme scheme;
+} protocols[] = {
+	{ "https://", 8, SCHEME_HTTPS },
+	{ "git://",   6, SCHEME_GIT   },
+	{ "ssh://",   6, SCHEME_SSH   },
+	{ "http://",  7, SCHEME_HTTP  },
+	{ "ftps://",  7, SCHEME_FTP   },
+	{ "ftp://",   6, SCHEME_FTP   },
+};
+
 int
 parse_url(const char *pattern, struct url *url)
 {
+	size_t i;
+
 	if (pattern == NULL || url == NULL)
 		return -1;
 
 	memset(url, 0, sizeof(*url));
 	url->scheme = SCHEME_UNDEFINED;
 
-	if (strncmp(pattern, "https://", 8) == 0)
-		return parse_standard_url(pattern, url, SCHEME_HTTPS);
-	if (strncmp(pattern, "git://", 6) == 0)
-		return parse_standard_url(pattern, url, SCHEME_GIT);
-	if (strncmp(pattern, "ssh://", 6) == 0)
-		return parse_standard_url(pattern, url, SCHEME_SSH);
-
-	if (strncmp(pattern, "http://", 7) == 0)
-		return parse_standard_url(pattern, url, SCHEME_HTTP);
-	if (strncmp(pattern, "ftps://", 7) == 0)
-		return parse_standard_url(pattern, url, SCHEME_FTP);
-	if (strncmp(pattern, "ftp://", 6) == 0)
-		return parse_standard_url(pattern, url, SCHEME_FTP);
+	for (i = 0; i < sizeof(protocols) / sizeof(protocols[0]); i++) {
+		if (strncmp(pattern, protocols[i].prefix, protocols[i].len) == 0)
+			return parse_standard_url(pattern, url, protocols[i].scheme);
+	}
 
 	if (fnmatch("*@*:*/*", pattern, 0) == 0)
 		return parse_scp(pattern, url);
