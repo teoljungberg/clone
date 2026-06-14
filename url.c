@@ -1,3 +1,4 @@
+#include "compat.h"
 #include "url.h"
 
 #include <err.h>
@@ -102,7 +103,7 @@ parse_url(const char *pattern, struct url *url)
 	memset(url, 0, sizeof(*url));
 	url->scheme = SCHEME_UNDEFINED;
 
-	for (i = 0; i < sizeof(protocols) / sizeof(protocols[0]); i++) {
+	for (i = 0; i < nitems(protocols); i++) {
 		if (strncmp(pattern, protocols[i].prefix, protocols[i].len) == 0)
 			return parse_standard_url(pattern, url, protocols[i].scheme);
 	}
