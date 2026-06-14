@@ -25,5 +25,6 @@ struct url {
 
 int	 parse_url(const char *, struct url *);
 void	 free_url(struct url *);
+int	 invalid_scheme(enum scheme);
 
 #endif /* _CLONE_URL_H_ */

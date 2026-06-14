@@ -103,6 +103,14 @@ parse_url(const char *pattern, struct url *url)
 	return -1;
 }
 
+int
+invalid_scheme(enum scheme scheme)
+{
+	return scheme == SCHEME_GIT ||
+	    scheme == SCHEME_HTTP ||
+	    scheme == SCHEME_FTP;
+}
+
 void
 free_url(struct url *url)
 {

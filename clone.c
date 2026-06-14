@@ -170,9 +170,7 @@ main(int argc, char *argv[])
 	pattern = argv[0];
 
 	if (parse_url(pattern, &parsed) == 0) {
-		if (parsed.scheme == SCHEME_GIT ||
-		    parsed.scheme == SCHEME_HTTP ||
-		    parsed.scheme == SCHEME_FTP) {
+		if (invalid_scheme(parsed.scheme)) {
 			free_url(&parsed);
 			errx(1, "unsupported protocol: %s",
 			    pattern);
