@@ -2,8 +2,14 @@
 #include "url.h"
 
 #include <err.h>
+#include <fnmatch.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #define GIT_SUFFIX	".git"
 #define GIT_SUFFIX_LEN	(sizeof(GIT_SUFFIX) - 1)
@@ -26,7 +32,7 @@ find_git_suffix(const char *str)
 	return NULL;
 }
 
-char *
+static char *
 copy_substring(const char *start, const char *end)
 {
 	char *result;
@@ -40,7 +46,7 @@ copy_substring(const char *start, const char *end)
 	return result;
 }
 
-struct Repository
+static struct Repository
 extract_repository_from_url(const struct url *url)
 {
 	struct Repository repository = {0};
@@ -117,7 +123,7 @@ extract_repository_from_url(const struct url *url)
 	return repository;
 }
 
-void
+static void
 overload_repository_with_pattern(struct Repository *repository,
     const char *pattern)
 {
@@ -157,7 +163,7 @@ overload_repository_with_pattern(struct Repository *repository,
 	}
 }
 
-struct Repository
+static struct Repository
 extract_repository_from_cwd(const char *clone_path, const char *pattern)
 {
 	struct Repository repository = {.scheme = SCHEME_SCP};
