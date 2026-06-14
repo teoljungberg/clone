@@ -15,7 +15,7 @@ MANPREFIX?=	${PREFIX}/share/man
 INSTALL_PROGRAM=	install -s -m 0755
 INSTALL_MAN=		install -m 0644
 
-CFLAGS+=	-pedantic -Wall -Wextra
+CFLAGS+=	-pedantic -Wall -Wextra -Wunused -Wmissing-prototypes -Wstrict-prototypes
 CFLAGS+=	-DVERSION=\"${VERSION}\"
 CFLAGS+=	-DCLONE_PATH=\"${CLONE_PATH}\"
 # Uncomment to enable debugging

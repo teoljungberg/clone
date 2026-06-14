@@ -21,7 +21,7 @@ usage(void)
 #define CLONE_PATH "~/src"
 #endif
 
-char *
+static char *
 expand_tilde(const char *path)
 {
 	char *expanded, *home, *result;
@@ -59,7 +59,7 @@ expand_tilde(const char *path)
 	return expanded;
 }
 
-char *
+static char *
 get_clone_path(void)
 {
 	static char *cached_path = NULL;

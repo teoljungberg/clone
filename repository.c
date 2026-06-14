@@ -335,7 +335,7 @@ extract_location_from_repository(const char *clone_path,
 	    repository.host, repository.user, repository.name);
 }
 
-char *
+static char *
 extract_ssh_url_from_repository(struct Repository repository)
 {
 	const char *login;
@@ -346,7 +346,7 @@ extract_ssh_url_from_repository(struct Repository repository)
 	    repository.user, repository.name);
 }
 
-char *
+static char *
 extract_https_url_from_repository(struct Repository repository)
 {
 	if (repository.port != NULL)
@@ -358,7 +358,7 @@ extract_https_url_from_repository(struct Repository repository)
 		    repository.host, repository.user, repository.name);
 }
 
-char *
+static char *
 extract_ssh_url_string_from_repository(struct Repository repository)
 {
 	if (repository.port != NULL)
