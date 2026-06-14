@@ -1,6 +1,7 @@
 VERSION=	0.0.1
 CLONE_PATH?=	~/src
 
+CC?=		cc
 PROG=	clone
 
 SRCS=	clone.c
