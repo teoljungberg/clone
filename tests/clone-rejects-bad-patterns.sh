@@ -75,3 +75,12 @@ if testcase "clone rejects bad patterns - ssh:// deep path"; then
     "clone: could not extract repository: ssh://anonymous@got.gameoftrees.org/a/b/got" \
     "$(clone "ssh://anonymous@got.gameoftrees.org/a/b/got")"
 fi
+
+if testcase "clone rejects bad patterns - colon before the first @"; then
+  assert_eq \
+    "clone: could not extract repository: foo:bar@host:user/repo" \
+    "$(clone "foo:bar@host:user/repo")"
+  assert_eq \
+    "clone: could not extract repository: a:b@c:d/e" \
+    "$(clone "a:b@c:d/e")"
+fi

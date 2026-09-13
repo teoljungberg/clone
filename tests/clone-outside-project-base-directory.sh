@@ -46,6 +46,12 @@ if testcase "clone full SCP URLs with non-git login user outside clone's directo
     "$(clone "deploy@github.com:user/project.git")"
 fi
 
+if testcase "clone full SCP URLs with an empty login user outside clone's directory structure"; then
+  assert_eq \
+    "git clone @host:user/project $HOME/src/host/user/project" \
+    "$(clone "@host:user/project")"
+fi
+
 if testcase "clone full ssh:// URLs outside clone's directory structure"; then
   assert_eq \
     "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
@@ -71,6 +77,15 @@ if testcase "clone https:// URLs with port outside clone's directory structure";
   assert_eq \
     "git clone https://github.com:8443/user/project $HOME/src/github.com/user/project" \
     "$(clone "https://github.com:8443/user/project.git")"
+fi
+
+if testcase "clone URLs with an empty port outside clone's directory structure"; then
+  assert_eq \
+    "git clone ssh://user@host:/got $HOME/src/host/user/got" \
+    "$(clone "ssh://user@host:/got")"
+  assert_eq \
+    "git clone https://host:/user/project $HOME/src/host/user/project" \
+    "$(clone "https://host:/user/project")"
 fi
 
 rmdir "$tmpdir"
