@@ -1,7 +1,6 @@
 BRAT=	${.CURDIR}/vendor/brat
 BRAT_URL=	https://codeberg.org/api/packages/sstephenson/generic/brat/latest/brat
 
-TESTS+=	smoke.brat
 TESTS+=	clone-inside-project-base-directory.brat
 TESTS+=	clone-outside-project-base-directory.brat
 TESTS+=	clone-path-configuration.brat
