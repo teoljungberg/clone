@@ -1,0 +1,91 @@
+#!/bin/sh
+
+CLONE="$DIR/../clone"
+
+@test "clone rejects bad patterns - git://" {
+  run "$CLONE" -n "git://github.com/user/project"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: git://github.com/user/project'
+
+  run "$CLONE" -n "git://github.com/user/project.git"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: git://github.com/user/project.git'
+}
+
+@test "clone rejects bad patterns - http://" {
+  run "$CLONE" -n "http://github.com/user/project"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: http://github.com/user/project'
+
+  run "$CLONE" -n "http://github.com:8080/user/project"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: http://github.com:8080/user/project'
+}
+
+@test "clone rejects bad patterns - ftp://" {
+  run "$CLONE" -n "ftp://github.com/user/project"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: ftp://github.com/user/project'
+
+  run "$CLONE" -n "ftps://github.com/user/project"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: unsupported protocol: ftps://github.com/user/project'
+}
+
+@test "clone rejects path traversal in hostname" {
+  run "$CLONE" -n "git@../../etc:user/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: git@../../etc:user/repo'
+
+  run "$CLONE" -n "git@foo/../bar:user/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: git@foo/../bar:user/repo'
+
+  run "$CLONE" -n "ssh://anonymous@../../etc/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: ssh://anonymous@../../etc/repo'
+}
+
+@test "clone rejects path traversal in user" {
+  run "$CLONE" -n "git@github.com:../user/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: git@github.com:../user/repo'
+
+  run "$CLONE" -n "https://github.com/../user/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: https://github.com/../user/repo'
+
+  run "$CLONE" -n "ssh://..@got.gameoftrees.org/got"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: ssh://..@got.gameoftrees.org/got'
+}
+
+@test "clone rejects path traversal in repository name" {
+  run "$CLONE" -n "git@github.com:user/../repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: git@github.com:user/../repo'
+
+  run "$CLONE" -n "git@github.com:user/repo/../other"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: git@github.com:user/repo/../other'
+
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/../got"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: ssh://anonymous@got.gameoftrees.org/../got'
+}
+
+@test "clone rejects path traversal in port" {
+  run "$CLONE" -n "ssh://user@host:../22/got"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: ssh://user@host:../22/got'
+
+  run "$CLONE" -n "https://host:../user/repo"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: https://host:../user/repo'
+}
+
+@test "clone rejects bad patterns - ssh:// deep path" {
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/a/b/got"
+  [ $status -eq 1 ]
+  match "$stderr" 'clone: could not extract repository: ssh://anonymous@got.gameoftrees.org/a/b/got'
+}

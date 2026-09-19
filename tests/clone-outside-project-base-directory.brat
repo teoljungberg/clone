@@ -1,0 +1,83 @@
+#!/bin/sh
+
+CLONE="$DIR/../clone"
+
+@test "clone full git+ssh github.com URLs outside clone's directory structure" {
+  run "$CLONE" -n "git@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $HOME/src/github.com/user/project"
+
+  run "$CLONE" -n "git@github.com:user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $HOME/src/github.com/user/project"
+}
+
+@test "clone full git+ssh git.sr.ht URLs outside clone's directory structure" {
+  run "$CLONE" -n "git@git.sr.ht:~user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@git.sr.ht:~user/project $HOME/src/git.sr.ht/~user/project"
+
+  run "$CLONE" -n "git@git.sr.ht:~user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@git.sr.ht:~user/project $HOME/src/git.sr.ht/~user/project"
+}
+
+@test "clone full https:// github.com URLs outside clone's directory structure" {
+  run "$CLONE" -n "https://github.com/user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com/user/project $HOME/src/github.com/user/project"
+
+  run "$CLONE" -n "https://github.com/user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com/user/project $HOME/src/github.com/user/project"
+}
+
+@test "clone full https:// any other URLs outside clone's directory structure" {
+  run "$CLONE" -n "https://example.com/user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://example.com/user/project $HOME/src/example.com/user/project"
+
+  run "$CLONE" -n "https://example.com/user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://example.com/user/project $HOME/src/example.com/user/project"
+}
+
+@test "clone full SCP URLs with non-git login user outside clone's directory structure" {
+  run "$CLONE" -n "deploy@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone deploy@github.com:user/project $HOME/src/github.com/user/project"
+
+  run "$CLONE" -n "deploy@github.com:user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone deploy@github.com:user/project $HOME/src/github.com/user/project"
+}
+
+@test "clone full ssh:// URLs outside clone's directory structure" {
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/got.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got"
+
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/got"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got"
+}
+
+@test "clone ssh:// URLs with port outside clone's directory structure" {
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org:2222/got"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org:2222/got $HOME/src/got.gameoftrees.org/anonymous/got"
+
+  run "$CLONE" -n "ssh://anonymous@got.gameoftrees.org:2222/got.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org:2222/got $HOME/src/got.gameoftrees.org/anonymous/got"
+}
+
+@test "clone https:// URLs with port outside clone's directory structure" {
+  run "$CLONE" -n "https://github.com:8443/user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com:8443/user/project $HOME/src/github.com/user/project"
+
+  run "$CLONE" -n "https://github.com:8443/user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com:8443/user/project $HOME/src/github.com/user/project"
+}

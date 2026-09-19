@@ -1,3 +1,4 @@
 /clone
 /clone.core
 /*.o
+/tests/vendor/brat

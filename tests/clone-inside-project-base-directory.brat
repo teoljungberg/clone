@@ -1,0 +1,113 @@
+#!/bin/sh
+
+CLONE="$DIR/../clone"
+
+setup() {
+  tmpdir=$(mktemp -d "$TEST_TMP.XXXXXX")
+  tmpdir=$(cd "$tmpdir" && pwd -P)
+  mkdir -p "$tmpdir/src/github.com/user/clone"
+}
+
+@test "clone full git+ssh github.com URLs inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "git@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $tmpdir/src/github.com/user/project"
+
+  run env HOME="$tmpdir" "$CLONE" -n "git@github.com:user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $tmpdir/src/github.com/user/project"
+}
+
+@test "clone full git+ssh git.sr.ht URLs inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "git@git.sr.ht:~user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@git.sr.ht:~user/project $tmpdir/src/git.sr.ht/~user/project"
+
+  run env HOME="$tmpdir" "$CLONE" -n "git@git.sr.ht:~user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@git.sr.ht:~user/project $tmpdir/src/git.sr.ht/~user/project"
+}
+
+@test "clone full ssh:// URLs inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/got.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org/got $tmpdir/src/got.gameoftrees.org/anonymous/got"
+
+  run env HOME="$tmpdir" "$CLONE" -n "ssh://anonymous@got.gameoftrees.org/got"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org/got $tmpdir/src/got.gameoftrees.org/anonymous/got"
+}
+
+@test "clone full ssh:// URLs with port inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "ssh://anonymous@got.gameoftrees.org:2222/got"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone ssh://anonymous@got.gameoftrees.org:2222/got $tmpdir/src/got.gameoftrees.org/anonymous/got"
+}
+
+@test "clone full SCP URLs with non-git login user inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "deploy@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone deploy@github.com:user/project $tmpdir/src/github.com/user/project"
+}
+
+@test "clone full https github.com URLs inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "https://github.com/user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com/user/project $tmpdir/src/github.com/user/project"
+
+  run env HOME="$tmpdir" "$CLONE" -n "https://github.com/user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com/user/project $tmpdir/src/github.com/user/project"
+}
+
+@test "clone full https:// URLs with port inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "https://github.com:8443/user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone https://github.com:8443/user/project $tmpdir/src/github.com/user/project"
+}
+
+@test "clone user/repository_name patterns inside clone's directory structure" {
+  cd "$tmpdir/src/github.com/user/clone"
+
+  run env HOME="$tmpdir" "$CLONE" -n "another-user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:another-user/project $tmpdir/src/github.com/another-user/project"
+
+  run env HOME="$tmpdir" "$CLONE" -n "another-user/project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:another-user/project $tmpdir/src/github.com/another-user/project"
+}
+
+@test "clone repository_name patterns inside a user's clone directory structure" {
+  cd "$tmpdir/src/github.com/user"
+
+  run env HOME="$tmpdir" "$CLONE" -n "project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $tmpdir/src/github.com/user/project"
+
+  run env HOME="$tmpdir" "$CLONE" -n "project.git"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $tmpdir/src/github.com/user/project"
+}
+
+@test "clone user/repository_name patterns inside a host of a clone directory structure" {
+  cd "$tmpdir/src/github.com"
+
+  run env HOME="$tmpdir" "$CLONE" -n "another-user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:another-user/project $tmpdir/src/github.com/another-user/project"
+}
