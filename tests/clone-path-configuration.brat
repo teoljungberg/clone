@@ -1,0 +1,20 @@
+#!/bin/sh
+
+@test "clone respects default CLONE_PATH" {
+  run "$DIR/../clone" -n "git@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $HOME/src/github.com/user/project"
+}
+
+@test "clone respects custom CLONE_PATH" {
+  (cd "$DIR/.." && make clean >/dev/null 2>&1)
+  (cd "$DIR/.." && make CLONE_PATH="$TEST_TMP/custom" >/dev/null 2>&1)
+  (cd "$DIR/.." && make install DESTDIR="$TEST_TMP" PREFIX="/usr/local" >/dev/null 2>&1)
+
+  run "$TEST_TMP/usr/local/bin/clone" -n "git@github.com:user/project"
+  [ $status -eq 0 ]
+  match "$stdout" "git clone git@github.com:user/project $TEST_TMP/custom/github.com/user/project"
+
+  (cd "$DIR/.." && make clean >/dev/null 2>&1)
+  (cd "$DIR/.." && make >/dev/null 2>&1)
+}
