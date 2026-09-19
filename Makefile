@@ -47,7 +47,6 @@ lint:
 
 fmt:
 	knfmt -is ${SRCS}
-	${MAKE} -C ${.CURDIR}/tests fmt
 
 test: ${PROG}
 	${MAKE} -C ${.CURDIR}/tests

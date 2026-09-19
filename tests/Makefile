@@ -11,9 +11,6 @@ all: test
 test: ${BRAT}
 	@ ${BRAT} ${TESTFLAGS} ${TESTS:%=${.CURDIR}/%}
 
-fmt:
-	shfmt -d -i 2 ${TESTS}
-
 ${BRAT}:
 	mkdir -p ${.CURDIR}/vendor
 	git clone ${BRAT_URL} ${.CURDIR}/vendor/brat
