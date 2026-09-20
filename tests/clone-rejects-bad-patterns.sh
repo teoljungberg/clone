@@ -25,6 +25,15 @@ if testcase "clone rejects bad patterns - ftp://"; then
     "$(clone "ftps://github.com/user/project")"
 fi
 
+if testcase "clone rejects https:// URLs without a user and repository"; then
+  assert_eq \
+    "clone: could not extract repository: https://github.com/project" \
+    "$(clone "https://github.com/project")"
+  assert_eq \
+    "clone: could not extract repository: https://github.com/project.git" \
+    "$(clone "https://github.com/project.git")"
+fi
+
 if testcase "clone rejects path traversal in hostname"; then
   assert_eq \
     "clone: could not extract repository: git@../../etc:user/repo" \
