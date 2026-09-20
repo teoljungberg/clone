@@ -57,7 +57,7 @@ char *
 get_clone_path(void)
 {
 	static char *cached_path = NULL;
-	char *expanded, *result;
+	char *expanded, *resolved, *result;
 	size_t len;
 
 	if (cached_path != NULL) {
@@ -75,6 +75,13 @@ get_clone_path(void)
 	len = strlen(expanded);
 	if (len > 0 && expanded[len - 1] == '/')
 		expanded[len - 1] = '\0';
+
+	/* resolve symlinks so getcwd() comparisons work */
+	resolved = realpath(expanded, NULL);
+	if (resolved != NULL) {
+		free(expanded);
+		expanded = resolved;
+	}
 
 	cached_path = expanded;
 	result = strdup(cached_path);

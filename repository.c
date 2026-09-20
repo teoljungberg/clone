@@ -160,15 +160,18 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 	char cwd[PATH_MAX];
 	char *end, *start;
 	const char *suffix;
+	size_t len;
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 		return repository;
 
-	start = strstr(cwd, clone_path);
-	if (start == NULL)
+	len = strlen(clone_path);
+	if (strncmp(cwd, clone_path, len) != 0)
+		return repository;
+	if (cwd[len] != '/' && cwd[len] != '\0')
 		return repository;
 
-	start += strlen(clone_path);
+	start = cwd + len;
 	if (*start == '/')
 		start++;
 	end = strchr(start, '/');
@@ -179,6 +182,7 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 		repository.host = strdup(start);
 		if (repository.host == NULL)
 			err(1, NULL);
+		start += strlen(start);
 	}
 
 	end = strchr(start, '/');
@@ -189,7 +193,7 @@ extract_repository_from_cwd(const char *clone_path, const char *pattern)
 		repository.user = strdup(start);
 		if (repository.user == NULL)
 			err(1, NULL);
-		start = start + strlen(start);
+		start += strlen(start);
 	}
 
 	end = strchr(start, '/');
