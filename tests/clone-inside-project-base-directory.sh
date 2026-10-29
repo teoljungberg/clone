@@ -67,6 +67,9 @@ if testcase "clone user/repository_name patterns inside clone's directory struct
   assert_eq \
     "git clone git@github.com:another-user/project $tmpdir/src/github.com/another-user/project" \
     "$(HOME=$tmpdir clone "another-user/project.git")"
+  assert_eq \
+    "git clone git@github.com:another-user/project $tmpdir/src/github.com/another-user/project" \
+    "$(HOME=$tmpdir clone "another-user/project/")"
 fi
 
 if testcase "clone repository_name patterns inside a user's clone directory structure"; then
@@ -78,6 +81,9 @@ if testcase "clone repository_name patterns inside a user's clone directory stru
   assert_eq \
     "git clone git@github.com:user/project $tmpdir/src/github.com/user/project" \
     "$(HOME=$tmpdir clone "project.git")"
+  assert_eq \
+    "git clone git@github.com:user/project $tmpdir/src/github.com/user/project" \
+    "$(HOME=$tmpdir clone "project/")"
 fi
 
 if testcase "clone user/repository_name patterns inside a host of a clone directory structure"; then

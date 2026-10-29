@@ -73,4 +73,19 @@ if testcase "clone https:// URLs with port outside clone's directory structure";
     "$(clone "https://github.com:8443/user/project.git")"
 fi
 
+if testcase "clone URLs with trailing slashes outside clone's directory structure"; then
+  assert_eq \
+    "git clone git@github.com:user/project $HOME/src/github.com/user/project" \
+    "$(clone "git@github.com:user/project/")"
+  assert_eq \
+    "git clone git@github.com:user/project $HOME/src/github.com/user/project" \
+    "$(clone "git@github.com:user/project///")"
+  assert_eq \
+    "git clone https://github.com/user/project $HOME/src/github.com/user/project" \
+    "$(clone "https://github.com/user/project/")"
+  assert_eq \
+    "git clone ssh://anonymous@got.gameoftrees.org/got $HOME/src/got.gameoftrees.org/anonymous/got" \
+    "$(clone "ssh://anonymous@got.gameoftrees.org/got/")"
+fi
+
 rmdir "$tmpdir"

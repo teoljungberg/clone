@@ -143,7 +143,7 @@ main(int argc, char *argv[])
 	struct Repository repository = {0};
 	struct url parsed = {0};
 	char *cmd[] = { "git", "clone", NULL, NULL, NULL };
-	char *clone_path, *clone_url, *location, *pattern;
+	char *clone_path, *clone_url, *location, *pattern, *slash;
 	int nflag = 0;
 	int ch;
 
@@ -168,6 +168,11 @@ main(int argc, char *argv[])
 		usage();
 
 	pattern = argv[0];
+
+	/* strip trailing slashes */
+	slash = strrchr(pattern, '\0');
+	while (--slash > pattern && *slash == '/')
+		*slash = '\0';
 
 	if (parse_url(pattern, &parsed) == 0) {
 		if (invalid_scheme(parsed.scheme)) {
